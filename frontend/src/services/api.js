@@ -41,6 +41,7 @@ export const taskService = {
     createTask: (data) => api.post('/tasks', data),
     updateTask: (id, data) => api.patch(`/tasks/${id}`, data),
     deleteTask: (id) => api.delete(`/tasks/${id}`),
+    deleteTaskByAdmin: (id) => api.delete(`/tasks/admin/${id}`),
     getMyTasks: () => api.get('/tasks/buyer/my-tasks')
 };
 
@@ -62,7 +63,8 @@ export const transactionService = {
 export const withdrawalService = {
     requestWithdrawal: (data) => api.post('/withdrawals', data),
     getMyWithdrawals: () => api.get('/withdrawals/my'),
-    getAllWithdrawals: () => api.get('/withdrawals')
+    getAllWithdrawals: () => api.get('/withdrawals'),
+    approveWithdrawal: (id) => api.patch(`/withdrawals/${id}/approve`)
 };
 
 // User services
@@ -71,6 +73,8 @@ export const userService = {
     getBestWorkers: () => api.get('/users/best'),
     getStats: () => api.get('/users/stats'),
     toggleUserStatus: (id) => api.patch(`/users/${id}/toggle-status`),
+    deleteUser: (id) => api.delete(`/users/${id}`),
+    updateRole: (id, role) => api.patch(`/users/${id}/role`, { role }),
     getNotifications: (params) => api.get('/users/notifications', { params }),
     markNotificationRead: (id) => api.patch(`/users/notifications/${id}/read`),
     markAllNotificationsRead: () => api.patch('/users/notifications/read-all')

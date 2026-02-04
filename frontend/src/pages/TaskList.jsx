@@ -46,6 +46,9 @@ const TaskList = () => {
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
                                     <h3 style={{ fontSize: '18px', fontWeight: '700' }}>{task.title}</h3>
                                     <span style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '4px',
                                         padding: '4px 12px',
                                         background: 'rgba(52, 211, 153, 0.1)',
                                         color: '#34d399',

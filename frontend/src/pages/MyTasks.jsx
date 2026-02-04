@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { taskService } from '../services/api';
 import DashboardLayout from '../components/DashboardLayout';
+import toast from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
 
 const MyTasks = () => {
@@ -35,11 +36,11 @@ const MyTasks = () => {
             const refillAmount = requiredWorkers * payableAmount;
 
             // Success alert & local state update
-            alert(`Task deleted. ${refillAmount} coins have been refilled to your account.`);
+            toast.success(`Task deleted. ${refillAmount} coins have been refilled.`);
             updateUser({ ...user, coins: user.coins + refillAmount });
             setTasks(tasks.filter(t => t._id !== taskId));
         } catch (error) {
-            alert(error.response?.data?.error || 'Failed to delete task');
+            toast.error(error.response?.data?.error || 'Failed to delete task');
         }
     };
 
@@ -95,7 +96,7 @@ const MyTasks = () => {
                                             <button
                                                 className="btn btn-secondary"
                                                 style={{ padding: '8px 12px', fontSize: '13px' }}
-                                                onClick={() => alert('Update feature coming in next iteration!')}
+                                                onClick={() => toast.success('Update feature coming soon!')}
                                             >
                                                 ✏️ Edit
                                             </button>

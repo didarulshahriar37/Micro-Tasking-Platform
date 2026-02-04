@@ -14,6 +14,14 @@ const notificationSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    toEmail: {
+        type: String,
+        required: true
+    },
+    actionRoute: {
+        type: String,
+        default: '/dashboard'
+    },
     type: {
         type: String,
         enum: ['task', 'submission', 'payment', 'system', 'report'],

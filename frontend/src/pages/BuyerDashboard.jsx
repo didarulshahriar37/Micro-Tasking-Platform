@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { taskService, submissionService } from '../services/api';
 import DashboardLayout from '../components/DashboardLayout';
 import { motion } from 'framer-motion';
+import toast from 'react-hot-toast';
 
 const BuyerDashboard = () => {
     const { user } = useAuth();
@@ -51,20 +52,20 @@ const BuyerDashboard = () => {
     const handleApprove = async (submissionId) => {
         try {
             await submissionService.reviewSubmission(submissionId, { status: 'approved' });
-            alert('Submission Approved! Worker has been paid.');
+            toast.success('Submission Approved! Worker has been paid.');
             fetchDashboardData();
         } catch (error) {
-            alert('Error approving submission');
+            toast.error('Error approving submission');
         }
     };
 
     const handleReject = async (submissionId) => {
         try {
             await submissionService.reviewSubmission(submissionId, { status: 'rejected' });
-            alert('Submission Rejected.');
+            toast.success('Submission Rejected.');
             fetchDashboardData();
         } catch (error) {
-            alert('Error rejecting submission');
+            toast.error('Error rejecting submission');
         }
     };
 

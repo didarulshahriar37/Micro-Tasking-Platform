@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { withdrawalService } from '../services/api';
 import DashboardLayout from '../components/DashboardLayout';
+import toast from 'react-hot-toast';
 
 const Withdrawals = () => {
     const { user } = useAuth();
@@ -20,12 +21,12 @@ const Withdrawals = () => {
         e.preventDefault();
 
         if (coinsToWithdraw > user.coins) {
-            alert("You don't have enough coins!");
+            toast.error("You don't have enough coins!");
             return;
         }
 
         if (coinsToWithdraw < MIN_COIN_WITHDRAWAL) {
-            alert(`Minimum withdrawal is ${MIN_COIN_WITHDRAWAL} coins.`);
+            toast.error(`Min withdrawal is ${MIN_COIN_WITHDRAWAL} coins.`);
             return;
         }
 
@@ -38,7 +39,7 @@ const Withdrawals = () => {
                 account_number: accountNumber
             });
 
-            alert('Withdrawal request submitted successfully! It will be processed soon.');
+            toast.success('Withdrawal request submitted!');
 
             // Optionally update user coins locally if we want immediate feedback
             // But usually withdrawal requests don't deduct until approved.

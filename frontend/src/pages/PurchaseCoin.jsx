@@ -3,6 +3,7 @@ import { transactionService } from '../services/api';
 import DashboardLayout from '../components/DashboardLayout';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 
 const PurchaseCoin = () => {
     const { user, updateUser } = useAuth();
@@ -27,7 +28,7 @@ const PurchaseCoin = () => {
             // In a real app, this would be a Stripe checkout session result
             const response = await transactionService.purchaseCoins(pkg.coins);
 
-            alert(`Payment Successful! ${pkg.coins} coins added to your account.`);
+            toast.success(`Payment Successful! ${pkg.coins} coins added.`);
             updateUser({ ...user, coins: user.coins + pkg.coins });
             navigate('/buyer/payment-history');
         } catch (error) {

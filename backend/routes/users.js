@@ -23,13 +23,7 @@ router.get('/best', async (req, res) => {
 // Get all users (Admin only)
 router.get('/', auth, authorize('admin'), async (req, res) => {
     try {
-        const { role, isActive } = req.query;
-        const filter = {};
-
-        if (role) filter.role = role;
-        if (isActive !== undefined) filter.isActive = isActive === 'true';
-
-        const users = await User.find(filter)
+        const users = await User.find()
             .select('-password')
             .sort({ createdAt: -1 });
 
@@ -39,27 +33,57 @@ router.get('/', auth, authorize('admin'), async (req, res) => {
     }
 });
 
+// Delete user (Admin only)
+router.delete('/:id', auth, authorize('admin'), async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id);
+        if (!user) return res.status(404).json({ error: 'User not found' });
+
+        await User.findByIdAndDelete(req.params.id);
+        res.json({ message: 'User deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Update user role (Admin only)
+router.patch('/:id/role', auth, authorize('admin'), async (req, res) => {
+    try {
+        const { role } = req.body;
+        if (!['admin', 'buyer', 'worker'].includes(role)) {
+            return res.status(400).json({ error: 'Invalid role' });
+        }
+
+        const user = await User.findByIdAndUpdate(req.params.id, { role }, { new: true }).select('-password');
+        if (!user) return res.status(404).json({ error: 'User not found' });
+
+        res.json({ message: 'User role updated successfully', user });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 // Get platform statistics
 router.get('/stats', auth, async (req, res) => {
     try {
         if (req.user.role === 'admin') {
-            const totalUsers = await User.countDocuments();
             const totalWorkers = await User.countDocuments({ role: 'worker' });
             const totalBuyers = await User.countDocuments({ role: 'buyer' });
-            const totalTasks = await Task.countDocuments();
-            const activeTasks = await Task.countDocuments({ status: 'active' });
-            const totalSubmissions = await Submission.countDocuments();
-            const pendingSubmissions = await Submission.countDocuments({ status: 'pending' });
+
+            // Total available coin (sum of all users coin)
+            const users = await User.find({});
+            const totalAvailableCoins = users.reduce((sum, user) => sum + (user.coins || 0), 0);
+
+            // Total payments (sum of all approved withdrawal request amounts)
+            const approvedWithdrawals = await Withdrawal.find({ status: 'approved' });
+            const totalPayments = approvedWithdrawals.reduce((sum, w) => sum + (w.withdrawal_amount || 0), 0);
 
             return res.json({
                 stats: {
-                    totalUsers,
                     totalWorkers,
                     totalBuyers,
-                    totalTasks,
-                    activeTasks,
-                    totalSubmissions,
-                    pendingSubmissions
+                    totalAvailableCoins,
+                    totalPayments
                 }
             });
         } else if (req.user.role === 'worker') {
@@ -115,7 +139,7 @@ router.patch('/:id/toggle-status', auth, authorize('admin'), async (req, res) =>
 router.get('/notifications', auth, async (req, res) => {
     try {
         const { limit = 20, unreadOnly } = req.query;
-        const filter = { user: req.user._id };
+        const filter = { toEmail: req.user.email };
 
         if (unreadOnly === 'true') {
             filter.isRead = false;

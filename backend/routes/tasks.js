@@ -22,7 +22,7 @@ router.get('/', auth, async (req, res) => {
         // Workers see only active tasks with available slots
         if (req.user.role === 'worker') {
             filter.status = 'active';
-            filter.availableSlots = { $gt: 0 };
+            filter.available_workers = { $gt: 0 };
             filter.deadline = { $gte: new Date() };
         }
 
@@ -140,6 +140,19 @@ router.get('/buyer/my-tasks', auth, authorize('buyer'), async (req, res) => {
             .sort({ deadline: -1 }); // Show in descending order based on compilation/deadline
 
         res.json({ tasks });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Delete any task (Admin only)
+router.delete('/admin/:id', auth, authorize('admin'), async (req, res) => {
+    try {
+        const task = await Task.findById(req.params.id);
+        if (!task) return res.status(404).json({ error: 'Task not found' });
+
+        await Task.findByIdAndDelete(req.params.id);
+        res.json({ message: 'Task deleted by Admin successfully' });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }

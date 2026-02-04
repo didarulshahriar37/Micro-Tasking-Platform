@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { taskService, submissionService } from '../services/api';
 import DashboardLayout from '../components/DashboardLayout';
+import toast from 'react-hot-toast';
 import { motion } from 'framer-motion';
 
 const TaskDetails = () => {
@@ -36,7 +37,7 @@ const TaskDetails = () => {
                 taskId: id,
                 submission_details
             });
-            alert('Submission successful! Your task is now pending review.');
+            toast.success('Submission successful! Under review.');
             navigate('/worker/my-submissions');
         } catch (error) {
             alert(error.response?.data?.error || 'Submission failed. Please try again.');

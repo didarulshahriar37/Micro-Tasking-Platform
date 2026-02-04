@@ -12,8 +12,8 @@ const Sidebar = () => {
             case 'worker':
                 return [
                     { to: '/worker', text: '📊 Dashboard Home', icon: 'home' },
-                    { to: '/worker/tasks', text: '🔍 Available Tasks', icon: 'tasks' },
-                    { to: '/worker/submissions', text: '📝 My Submissions', icon: 'file-alt' },
+                    { to: '/worker/task-list', text: '🔍 Available Tasks', icon: 'tasks' },
+                    { to: '/worker/my-submissions', text: '📝 My Submissions', icon: 'file-alt' },
                     { to: '/worker/withdrawals', text: '💰 Withdrawals', icon: 'wallet' },
                 ];
             case 'buyer':

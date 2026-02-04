@@ -77,9 +77,11 @@ router.post('/', auth, authorize('worker'), async (req, res) => {
         // Create notification for buyer
         await Notification.create({
             user: task.buyer,
+            toEmail: task.buyer.email,
             title: 'New Task Submission',
-            message: `A worker has submitted your task: ${task.title}`,
+            message: `You have a new submission from ${req.user.name} for completing ${task.title}`,
             type: 'submission',
+            actionRoute: '/buyer',
             relatedTask: task._id,
             relatedSubmission: submission._id
         });
@@ -158,9 +160,11 @@ router.patch('/:id/review', auth, authorize('buyer'), async (req, res) => {
             // Create notification for worker
             await Notification.create({
                 user: worker._id,
+                toEmail: worker.email,
                 title: 'Submission Approved',
-                message: `Your submission for "${submission.task.title}" has been approved! You earned ${reward} coins.`,
+                message: `You have earned ${reward} from ${req.user.name} for completing ${submission.task.title}`,
                 type: 'submission',
+                actionRoute: '/worker',
                 relatedTask: submission.task._id,
                 relatedSubmission: submission._id
             });
@@ -173,9 +177,11 @@ router.patch('/:id/review', auth, authorize('buyer'), async (req, res) => {
             // Create notification for worker
             await Notification.create({
                 user: submission.worker._id,
+                toEmail: submission.worker.email,
                 title: 'Submission Rejected',
-                message: `Your submission for "${submission.task.title}" has been rejected.`,
+                message: `Your submission for "${submission.task.title}" has been rejected by ${req.user.name}`,
                 type: 'submission',
+                actionRoute: '/worker',
                 relatedTask: submission.task._id,
                 relatedSubmission: submission._id
             });

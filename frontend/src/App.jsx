@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
+import { Toaster } from 'react-hot-toast';
 
 // Pages
 import Login from './pages/Login';
@@ -18,6 +19,8 @@ import TaskList from './pages/TaskList';
 import TaskDetails from './pages/TaskDetails';
 import MySubmissions from './pages/MySubmissions';
 import Withdrawals from './pages/Withdrawals';
+import ManageUsers from './pages/ManageUsers';
+import ManageTasks from './pages/ManageTasks';
 
 import './App.css';
 
@@ -83,7 +86,11 @@ const AppRoutes = () => {
         path="/admin/*"
         element={
           <ProtectedRoute allowedRoles={['admin']}>
-            <AdminDashboard />
+            <Routes>
+              <Route index element={<AdminDashboard />} />
+              <Route path="manage-users" element={<ManageUsers />} />
+              <Route path="manage-tasks" element={<ManageTasks />} />
+            </Routes>
           </ProtectedRoute>
         }
       />
@@ -97,6 +104,7 @@ function App() {
       <AuthProvider>
         <Router>
           <AppRoutes />
+          <Toaster position="top-right" reverseOrder={false} />
         </Router>
       </AuthProvider>
     </ThemeProvider>

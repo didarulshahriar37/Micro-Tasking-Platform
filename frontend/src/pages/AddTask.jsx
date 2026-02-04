@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { taskService } from '../services/api';
 import DashboardLayout from '../components/DashboardLayout';
+import toast from 'react-hot-toast';
 import axios from 'axios';
 
 const AddTask = () => {
@@ -54,7 +55,7 @@ const AddTask = () => {
         const totalPayable = required_workers * payable_amount;
 
         if (totalPayable > user.coins) {
-            alert('Not available Coin. Purchase Coin');
+            toast.error('Not available Coin. Purchase Coin');
             navigate('/buyer/purchase-coin');
             return;
         }
@@ -72,7 +73,7 @@ const AddTask = () => {
 
         try {
             const response = await taskService.createTask(taskData);
-            alert('Task created successfully!');
+            toast.success('Task created successfully!');
             // Update user coins locally
             updateUser({ ...user, coins: user.coins - totalPayable });
             navigate('/buyer/my-tasks');
