@@ -58,14 +58,23 @@ const Withdrawals = () => {
     return (
         <DashboardLayout>
             <div style={{ marginBottom: '40px' }}>
-                <h1 style={{ fontSize: '32px', fontWeight: '800', marginBottom: '8px' }}>Withdraw Funds</h1>
+                <h1 style={{ fontSize: 'clamp(24px, 5vw, 32px)', fontWeight: '800', marginBottom: '8px' }}>Withdraw Funds</h1>
                 <p style={{ color: 'var(--text-secondary)' }}>Convert your hard-earned coins into real money.</p>
             </div>
 
-            <div className="grid grid-2" style={{ gap: '48px', alignItems: 'start' }}>
+            <style>{`
+                @media (max-width: 1024px) {
+                    .withdrawal-container { grid-template-columns: 1fr !important; gap: 32px !important; }
+                    .withdrawal-info-card { padding: 30px 20px !important; }
+                    .withdrawal-info-card h3 { margin-bottom: 24px !important; }
+                    .withdrawal-info-card .amount { fontSize: 40px !important; }
+                }
+            `}</style>
+
+            <div className="grid grid-2 withdrawal-container" style={{ gap: '48px', alignItems: 'start' }}>
                 {/* Info Card */}
                 <div>
-                    <div className="card shadow-lg" style={{
+                    <div className="card shadow-lg withdrawal-info-card" style={{
                         background: 'linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%)',
                         color: 'white',
                         padding: '40px',

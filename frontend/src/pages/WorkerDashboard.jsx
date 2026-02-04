@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { userService, submissionService } from '../services/api';
 import DashboardLayout from '../components/DashboardLayout';
+import LoadingSpinner from '../components/LoadingSpinner';
 import { motion } from 'framer-motion';
 
 const WorkerDashboard = () => {
@@ -39,7 +40,7 @@ const WorkerDashboard = () => {
         }
     };
 
-    if (loading) return <DashboardLayout><div className="loading">Loading Dashboard info...</div></DashboardLayout>;
+    if (loading) return <DashboardLayout><LoadingSpinner text="Loading Dashboard info..." /></DashboardLayout>;
 
     return (
         <DashboardLayout>
@@ -71,42 +72,44 @@ const WorkerDashboard = () => {
 
             {/* Approved Submissions Table */}
             <div style={{ marginBottom: '24px' }}>
-                <h2 style={{ fontSize: '24px', fontWeight: '700', marginBottom: '16px' }}>Approved Submissions</h2>
+                <h2 style={{ fontSize: 'clamp(20px, 5vw, 24px)', fontWeight: '700', marginBottom: '16px' }}>Approved Submissions</h2>
                 <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
-                    <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-                        <thead style={{ background: 'rgba(255,255,255,0.02)', borderBottom: '1px solid var(--border-color)' }}>
-                            <tr>
-                                <th style={{ padding: '20px' }}>Task Title</th>
-                                <th style={{ padding: '20px' }}>Payable Amount</th>
-                                <th style={{ padding: '20px' }}>Buyer Name</th>
-                                <th style={{ padding: '20px', textAlign: 'right' }}>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {approvedSubmissions.length === 0 ? (
+                    <div style={{ overflowX: 'auto', width: '100%' }}>
+                        <table style={{ minWidth: '600px', width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+                            <thead style={{ background: 'rgba(255,255,255,0.02)', borderBottom: '1px solid var(--border-color)' }}>
                                 <tr>
-                                    <td colSpan="4" style={{ padding: '60px', textAlign: 'center', color: 'var(--text-secondary)' }}>
-                                        No approved submissions yet. Start earning!
-                                    </td>
+                                    <th style={{ padding: '20px' }}>Task Title</th>
+                                    <th style={{ padding: '20px' }}>Payable Amount</th>
+                                    <th style={{ padding: '20px' }}>Buyer Name</th>
+                                    <th style={{ padding: '20px', textAlign: 'right' }}>Status</th>
                                 </tr>
-                            ) : (
-                                approvedSubmissions.map((sub) => (
-                                    <tr key={sub._id} style={{ borderBottom: '1px solid var(--border-color)' }}>
-                                        <td style={{ padding: '20px' }}>
-                                            <div style={{ fontWeight: '600' }}>{sub.task_title || sub.task?.title}</div>
-                                        </td>
-                                        <td style={{ padding: '20px' }}>
-                                            <span style={{ color: '#34d399', fontWeight: '600' }}>💰 {sub.payable_amount || sub.task?.payable_amount}</span>
-                                        </td>
-                                        <td style={{ padding: '20px' }}>{sub.Buyer_name || sub.task?.buyer?.name}</td>
-                                        <td style={{ padding: '20px', textAlign: 'right' }}>
-                                            <span className="badge badge-success" style={{ padding: '6px 12px', fontSize: '12px' }}>Approved</span>
+                            </thead>
+                            <tbody>
+                                {approvedSubmissions.length === 0 ? (
+                                    <tr>
+                                        <td colSpan="4" style={{ padding: '60px', textAlign: 'center', color: 'var(--text-secondary)' }}>
+                                            No approved submissions yet.
                                         </td>
                                     </tr>
-                                ))
-                            )}
-                        </tbody>
-                    </table>
+                                ) : (
+                                    approvedSubmissions.map((sub) => (
+                                        <tr key={sub._id} style={{ borderBottom: '1px solid var(--border-color)' }}>
+                                            <td style={{ padding: '20px' }}>
+                                                <div style={{ fontWeight: '600' }}>{sub.task_title || sub.task?.title}</div>
+                                            </td>
+                                            <td style={{ padding: '20px' }}>
+                                                <span style={{ color: '#34d399', fontWeight: '700' }}>💰 {sub.payable_amount || sub.task?.payable_amount}</span>
+                                            </td>
+                                            <td style={{ padding: '20px' }}>{sub.Buyer_name || sub.task?.buyer?.name}</td>
+                                            <td style={{ padding: '20px', textAlign: 'right' }}>
+                                                <span className="badge badge-success" style={{ padding: '6px 12px', fontSize: '11px' }}>Approved</span>
+                                            </td>
+                                        </tr>
+                                    ))
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </DashboardLayout>

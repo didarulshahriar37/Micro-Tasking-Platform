@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { userService, withdrawalService } from '../services/api';
 import DashboardLayout from '../components/DashboardLayout';
+import LoadingSpinner from '../components/LoadingSpinner';
 import toast from 'react-hot-toast';
 
 const AdminDashboard = () => {
@@ -52,7 +53,7 @@ const AdminDashboard = () => {
         }
     };
 
-    if (loading) return <DashboardLayout><div className="loading">Loading Admin info...</div></DashboardLayout>;
+    if (loading) return <DashboardLayout><LoadingSpinner text="Loading Admin info..." /></DashboardLayout>;
 
     return (
         <DashboardLayout>
@@ -89,53 +90,55 @@ const AdminDashboard = () => {
 
             {/* Withdraw Request Table */}
             <div style={{ marginBottom: '24px' }}>
-                <h2 style={{ fontSize: '24px', fontWeight: '700', marginBottom: '16px' }}>Withdrawal Requests</h2>
+                <h2 style={{ fontSize: 'clamp(20px, 5vw, 24px)', fontWeight: '700', marginBottom: '16px' }}>Withdrawal Requests</h2>
                 <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
-                    <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-                        <thead style={{ background: 'rgba(255,255,255,0.02)', borderBottom: '1px solid var(--border-color)' }}>
-                            <tr>
-                                <th style={{ padding: '20px' }}>Worker Name</th>
-                                <th style={{ padding: '20px' }}>Withdraw Coin</th>
-                                <th style={{ padding: '20px' }}>Withdraw Amount ($)</th>
-                                <th style={{ padding: '20px' }}>Payment System</th>
-                                <th style={{ padding: '20px' }}>Account</th>
-                                <th style={{ padding: '20px', textAlign: 'right' }}>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {pendingWithdrawals.length === 0 ? (
+                    <div style={{ overflowX: 'auto', width: '100%' }}>
+                        <table style={{ minWidth: '800px', width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+                            <thead style={{ background: 'rgba(255,255,255,0.02)', borderBottom: '1px solid var(--border-color)' }}>
                                 <tr>
-                                    <td colSpan="6" style={{ padding: '60px', textAlign: 'center', color: 'var(--text-secondary)' }}>
-                                        No pending withdrawal requests.
-                                    </td>
+                                    <th style={{ padding: '20px' }}>Worker Name</th>
+                                    <th style={{ padding: '20px' }}>Withdraw Coin</th>
+                                    <th style={{ padding: '20px' }}>Withdraw Amount ($)</th>
+                                    <th style={{ padding: '20px' }}>Payment System</th>
+                                    <th style={{ padding: '20px' }}>Account</th>
+                                    <th style={{ padding: '20px', textAlign: 'right' }}>Actions</th>
                                 </tr>
-                            ) : (
-                                pendingWithdrawals.map((withdraw) => (
-                                    <tr key={withdraw._id} style={{ borderBottom: '1px solid var(--border-color)' }}>
-                                        <td style={{ padding: '20px' }}>
-                                            <div style={{ fontWeight: '600' }}>{withdraw.worker_name}</div>
-                                            <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{withdraw.worker_email}</div>
-                                        </td>
-                                        <td style={{ padding: '20px' }}>{withdraw.withdrawal_coin}</td>
-                                        <td style={{ padding: '20px' }}>
-                                            <span style={{ color: '#10b981', fontWeight: '700' }}>${withdraw.withdrawal_amount}</span>
-                                        </td>
-                                        <td style={{ padding: '20px' }}>{withdraw.payment_system}</td>
-                                        <td style={{ padding: '20px' }}>{withdraw.account_number}</td>
-                                        <td style={{ padding: '20px', textAlign: 'right' }}>
-                                            <button
-                                                className="btn btn-primary"
-                                                style={{ padding: '8px 16px', fontSize: '13px', background: '#10b981', borderColor: '#10b981' }}
-                                                onClick={() => handlePaymentSuccess(withdraw._id)}
-                                            >
-                                                ✅ Payment Success
-                                            </button>
+                            </thead>
+                            <tbody>
+                                {pendingWithdrawals.length === 0 ? (
+                                    <tr>
+                                        <td colSpan="6" style={{ padding: '60px', textAlign: 'center', color: 'var(--text-secondary)' }}>
+                                            No pending withdrawal requests.
                                         </td>
                                     </tr>
-                                ))
-                            )}
-                        </tbody>
-                    </table>
+                                ) : (
+                                    pendingWithdrawals.map((withdraw) => (
+                                        <tr key={withdraw._id} style={{ borderBottom: '1px solid var(--border-color)' }}>
+                                            <td style={{ padding: '20px' }}>
+                                                <div style={{ fontWeight: '600' }}>{withdraw.worker_name}</div>
+                                                <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{withdraw.worker_email}</div>
+                                            </td>
+                                            <td style={{ padding: '20px' }}>{withdraw.withdrawal_coin}</td>
+                                            <td style={{ padding: '20px' }}>
+                                                <span style={{ color: '#10b981', fontWeight: '700' }}>${withdraw.withdrawal_amount}</span>
+                                            </td>
+                                            <td style={{ padding: '20px' }}>{withdraw.payment_system}</td>
+                                            <td style={{ padding: '20px' }}>{withdraw.account_number}</td>
+                                            <td style={{ padding: '20px', textAlign: 'right' }}>
+                                                <button
+                                                    className="btn btn-primary"
+                                                    style={{ padding: '8px 16px', fontSize: '13px', background: '#10b981', borderColor: '#10b981' }}
+                                                    onClick={() => handlePaymentSuccess(withdraw._id)}
+                                                >
+                                                    ✅ Success
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </DashboardLayout>

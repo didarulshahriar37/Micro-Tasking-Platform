@@ -18,21 +18,22 @@ const PurchaseCoin = () => {
     ];
 
     const handlePurchase = async (pkg) => {
-        if (!window.confirm(`Purchase ${pkg.coins} coins for $${pkg.price}?`)) return;
-
         setLoading(true);
         try {
-            // Simulated payment flow
-            await new Promise(resolve => setTimeout(resolve, 1500));
+            const response = await transactionService.createCheckoutSession({
+                coins: pkg.coins,
+                price: pkg.price
+            });
 
-            // In a real app, this would be a Stripe checkout session result
-            const response = await transactionService.purchaseCoins(pkg.coins);
-
-            toast.success(`Payment Successful! ${pkg.coins} coins added.`);
-            updateUser({ ...user, coins: user.coins + pkg.coins });
-            navigate('/buyer/payment-history');
+            if (response.data.url) {
+                // Redirect user to Stripe Checkout
+                window.location.href = response.data.url;
+            } else {
+                toast.error('Failed to initialize local payment session');
+            }
         } catch (error) {
-            alert('Payment failed. Please try again.');
+            console.error('Purchase Error:', error);
+            toast.error(error.response?.data?.error || 'Payment failed to initialize');
         } finally {
             setLoading(false);
         }
@@ -41,10 +42,10 @@ const PurchaseCoin = () => {
     return (
         <DashboardLayout>
             <div style={{ marginBottom: '40px', textAlign: 'center' }}>
-                <h1 style={{ fontSize: '36px', fontWeight: '800', marginBottom: '12px' }}>
+                <h1 style={{ fontSize: 'clamp(28px, 6vw, 36px)', fontWeight: '800', marginBottom: '12px' }}>
                     Purchase <span style={{ color: 'var(--primary-color)' }}>Coins</span>
                 </h1>
-                <p style={{ color: 'var(--text-secondary)', fontSize: '18px' }}>
+                <p style={{ color: 'var(--text-secondary)', fontSize: 'clamp(14px, 4vw, 18px)' }}>
                     Boost your balance to post more tasks and reach more workers.
                 </p>
             </div>

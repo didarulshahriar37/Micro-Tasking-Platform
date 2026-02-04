@@ -88,7 +88,7 @@ const AddTask = () => {
         <DashboardLayout>
             <div style={{ maxWidth: '800px', margin: '0 auto' }}>
                 <div style={{ marginBottom: '32px' }}>
-                    <h1 style={{ fontSize: '32px', fontWeight: '800', marginBottom: '8px' }}>Create New Task</h1>
+                    <h1 style={{ fontSize: 'clamp(24px, 5vw, 32px)', fontWeight: '800', marginBottom: '8px' }}>Create New Task</h1>
                     <p style={{ color: 'var(--text-secondary)' }}>Fill in the details to post a new job for workers.</p>
                 </div>
 

@@ -5,14 +5,48 @@ import { Link } from 'react-router-dom';
 
 const DashboardLayout = ({ children }) => {
     const { user, logout } = useAuth();
+    const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
+
+    const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
     return (
         <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg-primary)' }}>
-            <Sidebar />
+            <style>{`
+                @media (max-width: 1024px) {
+                    .dashboard-sidebar {
+                        position: fixed !important;
+                        left: 0;
+                        transform: translateX(-100%);
+                    }
+                    .dashboard-sidebar.open {
+                        transform: translateX(0);
+                    }
+                    .sidebar-close-btn {
+                        display: block !important;
+                    }
+                    .dashboard-main-content {
+                        padding: 20px !important;
+                    }
+                    .dashboard-header {
+                        padding: 12px 15px !important;
+                    }
+                    .header-pill {
+                        padding: 4px 8px !important;
+                    }
+                    .user-name-box {
+                        display: none !important;
+                    }
+                    .dashboard-footer {
+                        padding: 15px !important;
+                    }
+                }
+            `}</style>
 
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+            <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', width: '100%' }}>
                 {/* Dashboard Header */}
-                <header style={{
+                <header className="dashboard-header" style={{
                     background: 'var(--bg-card)',
                     borderBottom: '1px solid var(--border-color)',
                     padding: '16px 32px',
@@ -24,6 +58,27 @@ const DashboardLayout = ({ children }) => {
                     zIndex: 90
                 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                        {/* Hamburger Menu */}
+                        <button
+                            onClick={toggleSidebar}
+                            style={{
+                                background: 'var(--bg-secondary)',
+                                border: '1px solid var(--border-color)',
+                                color: 'var(--text-primary)',
+                                width: '40px',
+                                height: '40px',
+                                borderRadius: '10px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                fontSize: '20px',
+                                cursor: 'pointer'
+                            }}
+                            className="lg-hide"
+                        >
+                            ☰
+                        </button>
+
                         <Link to="/" style={{ textDecoration: 'none' }}>
                             <h2 style={{
                                 fontSize: '20px',
@@ -37,49 +92,34 @@ const DashboardLayout = ({ children }) => {
                         </Link>
                     </div>
 
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                         {/* Coins */}
-                        <div style={{
+                        <div className="header-pill" style={{
                             padding: '8px 16px',
                             background: 'rgba(16, 185, 129, 0.1)',
                             border: '1px solid rgba(16, 185, 129, 0.2)',
                             borderRadius: '20px',
                             display: 'flex',
                             alignItems: 'center',
-                            gap: '8px',
+                            gap: '6px',
                             color: '#34d399',
-                            fontWeight: '600'
+                            fontWeight: '700',
+                            fontSize: '14px'
                         }}>
                             💰 {user?.coins || 0}
                         </div>
 
-                        {/* Notifications Placeholder */}
-                        <button style={{
-                            background: 'transparent',
-                            border: 'none',
-                            fontSize: '20px',
-                            cursor: 'pointer',
-                            color: 'var(--text-secondary)',
-                            position: 'relative'
-                        }}>
-                            🔔
-                            <span style={{
-                                position: 'absolute',
-                                top: '-2px',
-                                right: '-2px',
-                                width: '8px',
-                                height: '8px',
-                                background: 'var(--danger)',
-                                borderRadius: '50%',
-                                border: '2px solid var(--bg-card)'
-                            }}></span>
-                        </button>
-
                         {/* User Profile Info */}
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', paddingLeft: '24px', borderLeft: '1px solid var(--border-color)' }}>
-                            <div style={{ textAlign: 'right', display: 'none', md: 'block' }}>
-                                <div style={{ fontWeight: '700', fontSize: '14px', color: 'var(--text-primary)' }}>{user?.name}</div>
-                                <div style={{ fontSize: '12px', color: 'var(--primary-color)', fontWeight: '600', textTransform: 'capitalize' }}>
+                        <div style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '12px',
+                            paddingLeft: '12px',
+                            borderLeft: window.innerWidth > 640 ? '1px solid var(--border-color)' : 'none'
+                        }}>
+                            <div className="user-name-box" style={{ textAlign: 'right' }}>
+                                <div style={{ fontWeight: '700', fontSize: '13px', color: 'var(--text-primary)' }}>{user?.name}</div>
+                                <div style={{ fontSize: '11px', color: 'var(--primary-color)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                                     {user?.role}
                                 </div>
                             </div>
@@ -88,29 +128,29 @@ const DashboardLayout = ({ children }) => {
                                 src={user?.profileImage || 'https://ui-avatars.com/api/?name=' + user?.name}
                                 alt="Profile"
                                 style={{
-                                    width: '40px',
-                                    height: '40px',
+                                    width: '36px',
+                                    height: '36px',
                                     borderRadius: '50%',
                                     objectFit: 'cover',
-                                    border: '2px solid var(--border-color)'
+                                    border: '2px solid var(--bg-card)',
+                                    boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
                                 }}
                             />
 
                             <button
                                 onClick={logout}
                                 style={{
-                                    background: 'rgba(239, 68, 68, 0.1)',
+                                    background: 'rgba(239, 68, 68, 0.08)',
                                     color: 'var(--danger)',
                                     border: 'none',
                                     padding: '8px',
                                     borderRadius: '8px',
                                     cursor: 'pointer',
                                     fontSize: '18px',
-                                    transition: 'all 0.3s'
+                                    transition: 'all 0.2s'
                                 }}
-                                title="Logout"
-                                onMouseEnter={(e) => e.target.style.background = 'rgba(239, 68, 68, 0.2)'}
-                                onMouseLeave={(e) => e.target.style.background = 'rgba(239, 68, 68, 0.1)'}
+                                onMouseEnter={(e) => e.target.style.background = 'rgba(239, 68, 68, 0.15)'}
+                                onMouseLeave={(e) => e.target.style.background = 'rgba(239, 68, 68, 0.08)'}
                             >
                                 🚪
                             </button>
@@ -119,19 +159,20 @@ const DashboardLayout = ({ children }) => {
                 </header>
 
                 {/* Main Content Area */}
-                <main style={{ padding: '32px', flex: 1, overflowY: 'auto' }}>
+                <main className="dashboard-main-content" style={{ padding: '32px', flex: 1, overflowY: 'auto' }}>
                     {children}
                 </main>
 
                 {/* Footer */}
-                <footer style={{
+                <footer className="dashboard-footer" style={{
                     padding: '24px 32px',
                     textAlign: 'center',
                     borderTop: '1px solid var(--border-color)',
                     color: 'var(--text-secondary)',
-                    fontSize: '14px'
+                    fontSize: '13px',
+                    fontWeight: '500'
                 }}>
-                    Dashboard Footer - Managed by MicroTask
+                    MicroTask Platform • 2026
                 </footer>
             </div>
         </div>

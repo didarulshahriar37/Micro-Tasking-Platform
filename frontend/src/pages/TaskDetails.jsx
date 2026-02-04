@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { taskService, submissionService } from '../services/api';
 import DashboardLayout from '../components/DashboardLayout';
+import LoadingSpinner from '../components/LoadingSpinner';
 import toast from 'react-hot-toast';
 import { motion } from 'framer-motion';
 
@@ -46,17 +47,31 @@ const TaskDetails = () => {
         }
     };
 
-    if (loading) return <DashboardLayout><div className="loading">Loading task details...</div></DashboardLayout>;
+    if (loading) return <DashboardLayout><LoadingSpinner text="Loading task details..." /></DashboardLayout>;
     if (!task) return <DashboardLayout><div className="error">Task not found.</div></DashboardLayout>;
 
     return (
         <DashboardLayout>
             <div style={{ marginBottom: '40px' }}>
-                <h1 style={{ fontSize: '32px', fontWeight: '800', marginBottom: '8px' }}>Task Details</h1>
+                <h1 style={{ fontSize: 'clamp(24px, 5vw, 32px)', fontWeight: '800', marginBottom: '8px' }}>Task Details</h1>
                 <p style={{ color: 'var(--text-secondary)' }}>Read the instructions carefully before submitting.</p>
             </div>
 
-            <div className="grid grid-3" style={{ gap: '48px', alignItems: 'start' }}>
+            <style>{`
+                @media (max-width: 1024px) {
+                    .task-details-container { grid-template-columns: 1fr !important; gap: 24px !important; }
+                    .task-info-card-header { flex-direction: column !important; align-items: flex-start !important; gap: 16px !important; }
+                    .task-info-grid { grid-template-columns: repeat(2, 1fr) !important; }
+                    .task-image { height: 250px !important; }
+                    .task-content { padding: 24px !important; }
+                    .sticky-form { position: static !important; }
+                }
+                @media (max-width: 480px) {
+                    .task-info-grid { grid-template-columns: 1fr !important; }
+                }
+            `}</style>
+
+            <div className="grid grid-3 task-details-container" style={{ gap: '48px', alignItems: 'start' }}>
                 {/* Task Information */}
                 <div className="col-span-2">
                     <motion.div
@@ -68,10 +83,11 @@ const TaskDetails = () => {
                         <img
                             src={task.task_image_url || 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&q=80&w=1200'}
                             alt={task.title}
+                            className="task-image"
                             style={{ width: '100%', height: '350px', objectFit: 'cover' }}
                         />
-                        <div style={{ padding: '40px' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+                        <div className="task-content" style={{ padding: '40px' }}>
+                            <div className="task-info-card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
                                 <h2 style={{ fontSize: '28px', fontWeight: '800' }}>{task.title}</h2>
                                 <span style={{
                                     padding: '8px 20px',
@@ -85,7 +101,7 @@ const TaskDetails = () => {
                                 </span>
                             </div>
 
-                            <div style={{
+                            <div className="task-info-grid" style={{
                                 display: 'grid',
                                 gridTemplateColumns: 'repeat(4, 1fr)',
                                 gap: '20px',
@@ -136,7 +152,7 @@ const TaskDetails = () => {
                     <motion.div
                         initial={{ opacity: 0, x: 20 }}
                         animate={{ opacity: 1, x: 0 }}
-                        className="card"
+                        className="card sticky-form"
                         style={{ position: 'sticky', top: '100px' }}
                     >
                         <h2 style={{ fontSize: '24px', fontWeight: '800', marginBottom: '24px' }}>Submit Work</h2>

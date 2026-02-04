@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { taskService, submissionService } from '../services/api';
 import DashboardLayout from '../components/DashboardLayout';
+import LoadingSpinner from '../components/LoadingSpinner';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
 
@@ -69,7 +70,7 @@ const BuyerDashboard = () => {
         }
     };
 
-    if (loading) return <DashboardLayout><div className="loading">Loading Dashboard info...</div></DashboardLayout>;
+    if (loading) return <DashboardLayout><LoadingSpinner text="Loading Dashboard info..." /></DashboardLayout>;
 
     return (
         <DashboardLayout>
@@ -101,64 +102,59 @@ const BuyerDashboard = () => {
 
             {/* Task To Review Table */}
             <div style={{ marginBottom: '24px' }}>
-                <h2 style={{ fontSize: '24px', fontWeight: '700', marginBottom: '16px' }}>Tasks To Review</h2>
+                <h2 style={{ fontSize: 'clamp(20px, 5vw, 24px)', fontWeight: '700', marginBottom: '16px' }}>Tasks To Review</h2>
                 <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
-                    <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-                        <thead style={{ background: 'rgba(255,255,255,0.02)', borderBottom: '1px solid var(--border-color)' }}>
-                            <tr>
-                                <th style={{ padding: '20px' }}>Worker Name</th>
-                                <th style={{ padding: '20px' }}>Task Title</th>
-                                <th style={{ padding: '20px' }}>Payable</th>
-                                <th style={{ padding: '20px', textAlign: 'right' }}>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {pendingSubmissions.length === 0 ? (
+                    <div style={{ overflowX: 'auto', width: '100%' }}>
+                        <table style={{ minWidth: '700px', width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+                            <thead style={{ background: 'rgba(255,255,255,0.02)', borderBottom: '1px solid var(--border-color)' }}>
                                 <tr>
-                                    <td colSpan="4" style={{ padding: '60px', textAlign: 'center', color: 'var(--text-secondary)' }}>
-                                        No pending submissions to review. Good job!
-                                    </td>
+                                    <th style={{ padding: '16px 20px' }}>Worker</th>
+                                    <th style={{ padding: '16px 20px' }}>Task Title</th>
+                                    <th style={{ padding: '16px 20px' }}>Payable</th>
+                                    <th style={{ padding: '16px 20px', textAlign: 'right' }}>Actions</th>
                                 </tr>
-                            ) : (
-                                pendingSubmissions.map((submission) => (
-                                    <tr key={submission._id} style={{ borderBottom: '1px solid var(--border-color)' }}>
-                                        <td style={{ padding: '20px' }}>
-                                            <div style={{ fontWeight: '600' }}>{submission.worker?.name}</div>
-                                        </td>
-                                        <td style={{ padding: '20px' }}>{submission.task?.title}</td>
-                                        <td style={{ padding: '20px' }}>
-                                            <span style={{ color: '#34d399', fontWeight: '600' }}>💰 {submission.task?.payable_amount}</span>
-                                        </td>
-                                        <td style={{ padding: '20px', textAlign: 'right' }}>
-                                            <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
-                                                <button
-                                                    className="btn btn-secondary"
-                                                    style={{ padding: '8px 16px', fontSize: '13px' }}
-                                                    onClick={() => setSelectedSubmission(submission)}
-                                                >
-                                                    👁️ View Submission
-                                                </button>
-                                                <button
-                                                    className="btn btn-primary"
-                                                    style={{ padding: '8px 16px', fontSize: '13px', background: '#10b981', borderColor: '#10b981' }}
-                                                    onClick={() => handleApprove(submission._id)}
-                                                >
-                                                    ✅ Approve
-                                                </button>
-                                                <button
-                                                    className="btn btn-danger"
-                                                    style={{ padding: '8px 16px', fontSize: '13px' }}
-                                                    onClick={() => handleReject(submissionId)}
-                                                >
-                                                    ❌ Reject
-                                                </button>
-                                            </div>
+                            </thead>
+                            <tbody>
+                                {pendingSubmissions.length === 0 ? (
+                                    <tr>
+                                        <td colSpan="4" style={{ padding: '60px', textAlign: 'center', color: 'var(--text-secondary)' }}>
+                                            No pending submissions to review.
                                         </td>
                                     </tr>
-                                ))
-                            )}
-                        </tbody>
-                    </table>
+                                ) : (
+                                    pendingSubmissions.map((submission) => (
+                                        <tr key={submission._id} style={{ borderBottom: '1px solid var(--border-color)' }}>
+                                            <td style={{ padding: '16px 20px' }}>
+                                                <div style={{ fontWeight: '600' }}>{submission.worker?.name}</div>
+                                            </td>
+                                            <td style={{ padding: '16px 20px' }}>{submission.task?.title}</td>
+                                            <td style={{ padding: '16px 20px' }}>
+                                                <span style={{ color: '#34d399', fontWeight: '700' }}>💰 {submission.task?.payable_amount}</span>
+                                            </td>
+                                            <td style={{ padding: '16px 20px', textAlign: 'right' }}>
+                                                <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                                                    <button
+                                                        className="btn btn-secondary"
+                                                        style={{ padding: '6px 12px', fontSize: '12px' }}
+                                                        onClick={() => setSelectedSubmission(submission)}
+                                                    >
+                                                        👁️ View
+                                                    </button>
+                                                    <button
+                                                        className="btn btn-primary"
+                                                        style={{ padding: '6px 12px', fontSize: '12px', background: '#10b981', borderColor: '#10b981' }}
+                                                        onClick={() => handleApprove(submission._id)}
+                                                    >
+                                                        ✅ Approve
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 

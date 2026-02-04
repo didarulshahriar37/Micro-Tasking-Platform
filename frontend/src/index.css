@@ -31,3 +31,24 @@ a:hover {
 button {
   cursor: pointer;
 }
+
+/* Global Responsive Utilities */
+.lg-hide {
+  display: none;
+}
+
+@media (max-width: 1024px) {
+  .lg-hide {
+    display: flex;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}

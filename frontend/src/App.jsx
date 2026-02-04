@@ -21,6 +21,8 @@ import MySubmissions from './pages/MySubmissions';
 import Withdrawals from './pages/Withdrawals';
 import ManageUsers from './pages/ManageUsers';
 import ManageTasks from './pages/ManageTasks';
+import PaymentSuccess from './pages/PaymentSuccess';
+import LoadingSpinner from './components/LoadingSpinner';
 
 import './App.css';
 
@@ -28,7 +30,7 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
   const { user, loading } = useAuth();
 
   if (loading) {
-    return <div className="loading">Loading...</div>;
+    return <LoadingSpinner fullPage text="Authenticating..." />;
   }
 
   if (!user) {
@@ -76,6 +78,7 @@ const AppRoutes = () => {
               <Route path="my-tasks" element={<MyTasks />} />
               <Route path="purchase-coin" element={<PurchaseCoin />} />
               <Route path="payment-history" element={<PaymentHistory />} />
+              <Route path="payment-success" element={<PaymentSuccess />} />
             </Routes>
           </ProtectedRoute>
         }

@@ -55,7 +55,9 @@ export const submissionService = {
 // Transaction services
 export const transactionService = {
     getTransactions: (params) => api.get('/transactions', { params }),
-    purchaseCoins: (amount) => api.post('/transactions/purchase', { amount }),
+    purchaseCoins: (amount) => api.post('/transactions/purchase', { amount }), // Keeping as fallback/internal
+    createCheckoutSession: (data) => api.post('/transactions/create-checkout-session', data),
+    verifySession: (sessionId) => api.get(`/transactions/verify-session/${sessionId}`),
     withdrawCoins: (amount) => api.post('/transactions/withdraw', { amount })
 };
 

@@ -9,6 +9,10 @@ const app = express();
 
 // Middleware
 app.use(cors());
+
+// Webhook route MUST be before express.json() for raw body access
+app.use('/api/webhooks', require('./routes/webhooks'));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
