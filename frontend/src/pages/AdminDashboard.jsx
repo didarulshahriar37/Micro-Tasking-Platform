@@ -4,6 +4,7 @@ import { userService, withdrawalService } from '../services/api';
 import DashboardLayout from '../components/DashboardLayout';
 import LoadingSpinner from '../components/LoadingSpinner';
 import toast from 'react-hot-toast';
+import { HardHat, Handshake, Coins, BarChart3, CheckCircle } from 'lucide-react';
 
 const AdminDashboard = () => {
     const { user } = useAuth();
@@ -67,22 +68,30 @@ const AdminDashboard = () => {
             {/* Stats Cards */}
             <div className="grid grid-4" style={{ gap: '24px', marginBottom: '48px', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))' }}>
                 <div className="card" style={{ textAlign: 'center', padding: '32px' }}>
-                    <div style={{ fontSize: '40px', marginBottom: '16px' }}>👷</div>
+                    <div style={{ fontSize: '40px', marginBottom: '16px', color: 'var(--primary-color)' }}>
+                        <HardHat size={40} />
+                    </div>
                     <h3 style={{ fontSize: '14px', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Total Workers</h3>
                     <p style={{ fontSize: '32px', fontWeight: '800', color: 'var(--primary-color)' }}>{stats.totalWorkers}</p>
                 </div>
                 <div className="card" style={{ textAlign: 'center', padding: '32px' }}>
-                    <div style={{ fontSize: '40px', marginBottom: '16px' }}>🤝</div>
+                    <div style={{ fontSize: '40px', marginBottom: '16px', color: 'var(--secondary-color)' }}>
+                        <Handshake size={40} />
+                    </div>
                     <h3 style={{ fontSize: '14px', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Total Buyers</h3>
                     <p style={{ fontSize: '32px', fontWeight: '800', color: 'var(--secondary-color)' }}>{stats.totalBuyers}</p>
                 </div>
                 <div className="card" style={{ textAlign: 'center', padding: '32px' }}>
-                    <div style={{ fontSize: '40px', marginBottom: '16px' }}>💰</div>
+                    <div style={{ fontSize: '40px', marginBottom: '16px', color: '#f59e0b' }}>
+                        <Coins size={40} />
+                    </div>
                     <h3 style={{ fontSize: '14px', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Available Coin</h3>
                     <p style={{ fontSize: '32px', fontWeight: '800', color: '#f59e0b' }}>{stats.totalAvailableCoins}</p>
                 </div>
                 <div className="card" style={{ textAlign: 'center', padding: '32px' }}>
-                    <div style={{ fontSize: '40px', marginBottom: '16px' }}>💸</div>
+                    <div style={{ fontSize: '40px', marginBottom: '16px', color: '#10b981' }}>
+                        <BarChart3 size={40} />
+                    </div>
                     <h3 style={{ fontSize: '14px', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Total Payments</h3>
                     <p style={{ fontSize: '32px', fontWeight: '800', color: '#10b981' }}>${stats.totalPayments.toFixed(2)}</p>
                 </div>
@@ -130,7 +139,7 @@ const AdminDashboard = () => {
                                                     style={{ padding: '8px 16px', fontSize: '13px', background: '#10b981', borderColor: '#10b981' }}
                                                     onClick={() => handlePaymentSuccess(withdraw._id)}
                                                 >
-                                                    ✅ Success
+                                                    <CheckCircle size={14} /> Success
                                                 </button>
                                             </td>
                                         </tr>

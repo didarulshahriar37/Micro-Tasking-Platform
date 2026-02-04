@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { Home } from 'lucide-react';
 import axios from 'axios';
 
 const Register = () => {
@@ -118,7 +119,23 @@ const Register = () => {
     };
 
     return (
-        <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 20px' }}>
+        <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px 20px' }}>
+            <Link to="/" style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                color: 'var(--text-secondary)',
+                textDecoration: 'none',
+                marginBottom: '24px',
+                fontSize: '14px',
+                fontWeight: '600',
+                transition: 'color 0.2s'
+            }}
+                onMouseEnter={(e) => e.target.style.color = 'var(--primary-color)'}
+                onMouseLeave={(e) => e.target.style.color = 'var(--text-secondary)'}
+            >
+                <Home size={18} /> Back to Home
+            </Link>
             <div className="card" style={{ maxWidth: '450px', width: '100%' }}>
                 <h1 style={{ marginBottom: '12px', textAlign: 'center', fontSize: '28px' }}>
                     Join <span style={{ color: 'var(--primary-color)' }}>MicroTask</span>

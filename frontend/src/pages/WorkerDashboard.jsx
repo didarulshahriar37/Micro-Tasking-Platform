@@ -4,6 +4,7 @@ import { userService, submissionService } from '../services/api';
 import DashboardLayout from '../components/DashboardLayout';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { motion } from 'framer-motion';
+import { FileText, Clock, DollarSign } from 'lucide-react';
 
 const WorkerDashboard = () => {
     const { user } = useAuth();
@@ -54,19 +55,25 @@ const WorkerDashboard = () => {
             {/* Stats Cards */}
             <div className="grid grid-3" style={{ gap: '24px', marginBottom: '48px' }}>
                 <div className="card" style={{ textAlign: 'center', padding: '32px' }}>
-                    <div style={{ fontSize: '40px', marginBottom: '16px' }}>📝</div>
+                    <div style={{ fontSize: '40px', marginBottom: '16px', color: 'var(--primary-color)' }}>
+                        <FileText size={40} />
+                    </div>
                     <h3 style={{ fontSize: '14px', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Total Submission</h3>
                     <p style={{ fontSize: '36px', fontWeight: '800', color: 'var(--primary-color)' }}>{stats.totalSubmissions}</p>
                 </div>
                 <div className="card" style={{ textAlign: 'center', padding: '32px' }}>
-                    <div style={{ fontSize: '40px', marginBottom: '16px' }}>⏳</div>
+                    <div style={{ fontSize: '40px', marginBottom: '16px', color: '#f59e0b' }}>
+                        <Clock size={40} />
+                    </div>
                     <h3 style={{ fontSize: '14px', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Pending Submissions</h3>
                     <p style={{ fontSize: '36px', fontWeight: '800', color: '#f59e0b' }}>{stats.totalPendingSubmissions}</p>
                 </div>
                 <div className="card" style={{ textAlign: 'center', padding: '32px' }}>
-                    <div style={{ fontSize: '40px', marginBottom: '16px' }}>💰</div>
+                    <div style={{ fontSize: '40px', marginBottom: '16px', color: '#10b981' }}>
+                        <DollarSign size={40} />
+                    </div>
                     <h3 style={{ fontSize: '14px', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Total Earning</h3>
-                    <p style={{ fontSize: '36px', fontWeight: '800', color: '#34d399' }}>💰 {stats.totalEarnings}</p>
+                    <p style={{ fontSize: '36px', fontWeight: '800', color: '#34d399' }}>{stats.totalEarnings}</p>
                 </div>
             </div>
 
@@ -98,7 +105,9 @@ const WorkerDashboard = () => {
                                                 <div style={{ fontWeight: '600' }}>{sub.task_title || sub.task?.title}</div>
                                             </td>
                                             <td style={{ padding: '20px' }}>
-                                                <span style={{ color: '#34d399', fontWeight: '700' }}>💰 {sub.payable_amount || sub.task?.payable_amount}</span>
+                                                <span style={{ color: '#34d399', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                                    <DollarSign size={14} /> {sub.payable_amount || sub.task?.payable_amount}
+                                                </span>
                                             </td>
                                             <td style={{ padding: '20px' }}>{sub.Buyer_name || sub.task?.buyer?.name}</td>
                                             <td style={{ padding: '20px', textAlign: 'right' }}>

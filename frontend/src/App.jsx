@@ -23,6 +23,7 @@ import ManageUsers from './pages/ManageUsers';
 import ManageTasks from './pages/ManageTasks';
 import PaymentSuccess from './pages/PaymentSuccess';
 import LoadingSpinner from './components/LoadingSpinner';
+import NotFound from './pages/NotFound';
 
 import './App.css';
 

@@ -2,6 +2,7 @@ import React from 'react';
 import Sidebar from './Sidebar';
 import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
+import { Menu, LogOut, Coins } from 'lucide-react';
 
 const DashboardLayout = ({ children }) => {
     const { user, logout } = useAuth();
@@ -68,7 +69,6 @@ const DashboardLayout = ({ children }) => {
                                 width: '40px',
                                 height: '40px',
                                 borderRadius: '10px',
-                                display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
                                 fontSize: '20px',
@@ -76,7 +76,7 @@ const DashboardLayout = ({ children }) => {
                             }}
                             className="lg-hide"
                         >
-                            ☰
+                            <Menu size={24} />
                         </button>
 
                         <Link to="/" style={{ textDecoration: 'none' }}>
@@ -106,7 +106,7 @@ const DashboardLayout = ({ children }) => {
                             fontWeight: '700',
                             fontSize: '14px'
                         }}>
-                            💰 {user?.coins || 0}
+                            <Coins size={16} /> {user?.coins || 0}
                         </div>
 
                         {/* User Profile Info */}
@@ -152,7 +152,7 @@ const DashboardLayout = ({ children }) => {
                                 onMouseEnter={(e) => e.target.style.background = 'rgba(239, 68, 68, 0.15)'}
                                 onMouseLeave={(e) => e.target.style.background = 'rgba(239, 68, 68, 0.08)'}
                             >
-                                🚪
+                                <LogOut size={20} />
                             </button>
                         </div>
                     </div>

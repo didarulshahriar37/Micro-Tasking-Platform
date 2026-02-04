@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import MainLayout from '../components/MainLayout';
+import { useAuth } from '../context/AuthContext';
 import { userService } from '../services/api';
 import { Link } from 'react-router-dom';
 import HeroSlider from '../components/HeroSlider';
 import TestimonialSlider from '../components/TestimonialSlider';
 import { motion } from 'framer-motion';
 import WorkerSlider from '../components/WorkerSlider';
+import { UserPlus, ShieldCheck, Zap, ArrowRight, CheckCircle2, Star, Target } from 'lucide-react';
 
 const Home = () => {
+    const { user } = useAuth();
     const [bestWorkers, setBestWorkers] = useState([]);
 
     useEffect(() => {
@@ -112,7 +115,7 @@ const Home = () => {
                                 border: '1px solid rgba(99, 102, 241, 0.2)',
                                 color: '#818cf8'
                             }}>
-                                📝
+                                <UserPlus size={40} />
                             </div>
                             <h3 style={{ fontSize: '24px', marginBottom: '16px', fontWeight: '700' }}>1. Register</h3>
                             <p style={{ color: '#94a3b8', lineHeight: '1.7' }}>Create your free account in seconds. Choose to be a Worker or a Buyer.</p>
@@ -135,7 +138,7 @@ const Home = () => {
                                 border: '1px solid rgba(236, 72, 153, 0.2)',
                                 color: '#f472b6'
                             }}>
-                                🔍
+                                <ShieldCheck size={40} />
                             </div>
                             <h3 style={{ fontSize: '24px', marginBottom: '16px', fontWeight: '700' }}>2. Complete Info</h3>
                             <p style={{ color: '#94a3b8', lineHeight: '1.7' }}>Set up your profile and payment details to ensure smooth transactions.</p>
@@ -158,7 +161,7 @@ const Home = () => {
                                 border: '1px solid rgba(16, 185, 129, 0.2)',
                                 color: '#34d399'
                             }}>
-                                💰
+                                <Zap size={40} />
                             </div>
                             <h3 style={{ fontSize: '24px', marginBottom: '16px', fontWeight: '700' }}>3. Start Earning</h3>
                             <p style={{ color: '#94a3b8', lineHeight: '1.7' }}>Browse available tasks, complete them, and get paid instantly in coins.</p>
@@ -213,11 +216,15 @@ const Home = () => {
 
                             <ul style={{ listStyle: 'none', padding: 0 }}>
                                 <li style={{ marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '16px' }}>
-                                    <div style={{ minWidth: '32px', height: '32px', borderRadius: '50%', background: 'rgba(16, 185, 129, 0.2)', color: '#34d399', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px' }}>✓</div>
+                                    <div style={{ minWidth: '32px', height: '32px', borderRadius: '50%', background: 'rgba(16, 185, 129, 0.2)', color: '#34d399', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px' }}>
+                                        <CheckCircle2 size={16} />
+                                    </div>
                                     <span style={{ fontSize: '18px', color: 'var(--text-primary)' }}>Instant 24/7 Withdrawals</span>
                                 </li>
                                 <li style={{ marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '16px' }}>
-                                    <div style={{ minWidth: '32px', height: '32px', borderRadius: '50%', background: 'rgba(99, 102, 241, 0.2)', color: '#818cf8', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px' }}>✓</div>
+                                    <div style={{ minWidth: '32px', height: '32px', borderRadius: '50%', background: 'rgba(99, 102, 241, 0.2)', color: '#818cf8', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px' }}>
+                                        <CheckCircle2 size={16} />
+                                    </div>
                                     <span style={{ fontSize: '18px', color: 'var(--text-primary)' }}>Verified Buyers & Workers</span>
                                 </li>
                                 <li style={{ marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '16px' }}>
@@ -284,7 +291,7 @@ const Home = () => {
                             Join thousands of users who are already making money daily. No hidden fees, just simple tasks.
                         </p>
                         <Link to="/register" className="btn btn-primary" style={{ padding: '18px 48px', fontSize: '20px', borderRadius: '50px' }}>
-                            Get Started Now 🚀
+                            Get Started Now <ArrowRight size={20} style={{ marginLeft: '8px', verticalAlign: 'middle' }} />
                         </Link>
                     </motion.div>
                 </div>

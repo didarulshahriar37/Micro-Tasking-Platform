@@ -4,6 +4,7 @@ import DashboardLayout from '../components/DashboardLayout';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import { Medal, Gem, ShieldCheck } from 'lucide-react';
 
 const PurchaseCoin = () => {
     const { user, updateUser } = useAuth();
@@ -11,10 +12,10 @@ const PurchaseCoin = () => {
     const [loading, setLoading] = useState(false);
 
     const coinPackages = [
-        { coins: 10, price: 1, icon: '🥉' },
-        { coins: 150, price: 10, icon: '🥈' },
-        { coins: 500, price: 20, icon: '🥇' },
-        { coins: 1000, price: 35, icon: '💎' },
+        { coins: 10, price: 1, icon: <Medal size={48} color="#cd7f32" /> },
+        { coins: 150, price: 10, icon: <Medal size={48} color="#c0c0c0" /> },
+        { coins: 500, price: 20, icon: <Medal size={48} color="#ffd700" /> },
+        { coins: 1000, price: 35, icon: <Gem size={48} color="#4ade80" /> },
     ];
 
     const handlePurchase = async (pkg) => {
@@ -64,7 +65,7 @@ const PurchaseCoin = () => {
                             transition: 'transform 0.3s'
                         }}
                     >
-                        <div style={{ fontSize: '48px', marginBottom: '20px' }}>{pkg.icon}</div>
+                        <div style={{ marginBottom: '20px' }}>{pkg.icon}</div>
                         <h2 style={{ fontSize: '28px', fontWeight: '800', marginBottom: '8px' }}>{pkg.coins} Coins</h2>
                         <div style={{
                             fontSize: '24px',
@@ -91,7 +92,7 @@ const PurchaseCoin = () => {
             </div>
 
             <div style={{ marginTop: '64px', textAlign: 'center', padding: '40px', background: 'rgba(255,255,255,0.02)', borderRadius: '24px', border: '1px solid var(--border-color)' }}>
-                <h3>💳 Secure Payments</h3>
+                <h3><ShieldCheck size={24} style={{ verticalAlign: 'middle', marginRight: '8px', color: '#10b981' }} /> Secure Payments</h3>
                 <p style={{ color: 'var(--text-secondary)', marginTop: '8px' }}>
                     We use Stripe to ensure your transactions are always safe and encrypted.
                 </p>

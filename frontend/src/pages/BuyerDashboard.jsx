@@ -5,6 +5,7 @@ import DashboardLayout from '../components/DashboardLayout';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
+import { ClipboardList, Users, CreditCard, Eye, CheckCircle, XCircle, DollarSign } from 'lucide-react';
 
 const BuyerDashboard = () => {
     const { user } = useAuth();
@@ -28,8 +29,8 @@ const BuyerDashboard = () => {
                 submissionService.getAllSubmissions()
             ]);
 
-            const tasks = tasksRes.data.tasks;
-            const submissions = submissionsRes.data.submissions;
+            const tasks = tasksRes.data.tasks || [];
+            const submissions = submissionsRes.data.submissions || [];
 
             // Calculate stats
             const totalTasks = tasks.length;
@@ -84,19 +85,25 @@ const BuyerDashboard = () => {
             {/* Stats Cards */}
             <div className="grid grid-3" style={{ gap: '24px', marginBottom: '48px' }}>
                 <div className="card" style={{ textAlign: 'center', padding: '32px' }}>
-                    <div style={{ fontSize: '40px', marginBottom: '16px' }}>📋</div>
+                    <div style={{ fontSize: '40px', marginBottom: '16px', color: 'var(--primary-color)' }}>
+                        <ClipboardList size={40} />
+                    </div>
                     <h3 style={{ fontSize: '14px', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Total Tasks</h3>
                     <p style={{ fontSize: '36px', fontWeight: '800', color: 'var(--primary-color)' }}>{stats.totalTasks}</p>
                 </div>
                 <div className="card" style={{ textAlign: 'center', padding: '32px' }}>
-                    <div style={{ fontSize: '40px', marginBottom: '16px' }}>⏳</div>
+                    <div style={{ fontSize: '40px', marginBottom: '16px', color: '#f59e0b' }}>
+                        <Users size={40} />
+                    </div>
                     <h3 style={{ fontSize: '14px', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Pending Workers</h3>
                     <p style={{ fontSize: '36px', fontWeight: '800', color: '#f59e0b' }}>{stats.pendingWorkers}</p>
                 </div>
                 <div className="card" style={{ textAlign: 'center', padding: '32px' }}>
-                    <div style={{ fontSize: '40px', marginBottom: '16px' }}>💸</div>
+                    <div style={{ fontSize: '40px', marginBottom: '16px', color: '#34d399' }}>
+                        <CreditCard size={40} />
+                    </div>
                     <h3 style={{ fontSize: '14px', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Total Payments</h3>
-                    <p style={{ fontSize: '36px', fontWeight: '800', color: '#34d399' }}>💰 {stats.totalPayments}</p>
+                    <p style={{ fontSize: '36px', fontWeight: '800', color: '#34d399' }}>{stats.totalPayments}</p>
                 </div>
             </div>
 
@@ -129,7 +136,9 @@ const BuyerDashboard = () => {
                                             </td>
                                             <td style={{ padding: '16px 20px' }}>{submission.task?.title}</td>
                                             <td style={{ padding: '16px 20px' }}>
-                                                <span style={{ color: '#34d399', fontWeight: '700' }}>💰 {submission.task?.payable_amount}</span>
+                                                <span style={{ color: '#34d399', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                                    <DollarSign size={14} /> {submission.task?.payable_amount}
+                                                </span>
                                             </td>
                                             <td style={{ padding: '16px 20px', textAlign: 'right' }}>
                                                 <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
@@ -138,14 +147,14 @@ const BuyerDashboard = () => {
                                                         style={{ padding: '6px 12px', fontSize: '12px' }}
                                                         onClick={() => setSelectedSubmission(submission)}
                                                     >
-                                                        👁️ View
+                                                        <Eye size={14} /> View
                                                     </button>
                                                     <button
                                                         className="btn btn-primary"
                                                         style={{ padding: '6px 12px', fontSize: '12px', background: '#10b981', borderColor: '#10b981' }}
                                                         onClick={() => handleApprove(submission._id)}
                                                     >
-                                                        ✅ Approve
+                                                        <CheckCircle size={14} /> Approve
                                                     </button>
                                                 </div>
                                             </td>
@@ -198,14 +207,14 @@ const BuyerDashboard = () => {
                                 className="btn btn-primary"
                                 style={{ flex: 1, background: '#10b981', borderColor: '#10b981' }}
                             >
-                                ✅ Approve
+                                <CheckCircle size={18} /> Approve
                             </button>
                             <button
                                 onClick={() => { handleReject(selectedSubmission._id); setSelectedSubmission(null); }}
                                 className="btn btn-danger"
                                 style={{ flex: 1 }}
                             >
-                                ❌ Reject
+                                <XCircle size={18} /> Reject
                             </button>
                         </div>
                     </motion.div>

@@ -4,6 +4,7 @@ import DashboardLayout from '../components/DashboardLayout';
 import { useAuth } from '../context/AuthContext';
 import { authService, transactionService } from '../services/api';
 import toast from 'react-hot-toast';
+import { PartyPopper, Clock, CheckCircle } from 'lucide-react';
 
 const PaymentSuccess = () => {
     const [searchParams] = useSearchParams();
@@ -50,7 +51,9 @@ const PaymentSuccess = () => {
                 minHeight: '60vh',
                 textAlign: 'center'
             }}>
-                <div style={{ fontSize: '80px', marginBottom: '24px' }}>🎉</div>
+                <div style={{ fontSize: '80px', marginBottom: '24px', color: '#34d399' }}>
+                    <PartyPopper size={80} />
+                </div>
                 <h1 style={{ fontSize: '40px', fontWeight: '800', marginBottom: '16px' }}>Payment Successful!</h1>
                 <p style={{ color: 'var(--text-secondary)', fontSize: '18px', maxWidth: '500px', marginBottom: '32px' }}>
                     Thank you for your purchase. Your coins have been added to your balance.

@@ -1,6 +1,19 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import {
+    LayoutDashboard,
+    ListTodo,
+    CheckSquare,
+    Wallet,
+    PlusCircle,
+    ClipboardList,
+    Coins,
+    History,
+    Users,
+    Settings,
+    X
+} from 'lucide-react';
 
 const Sidebar = ({ isOpen, onClose }) => {
     const { user } = useAuth();
@@ -11,24 +24,24 @@ const Sidebar = ({ isOpen, onClose }) => {
         switch (user?.role) {
             case 'worker':
                 return [
-                    { to: '/worker', text: '📊 Dashboard Home', icon: 'home' },
-                    { to: '/worker/task-list', text: '🔍 Available Tasks', icon: 'tasks' },
-                    { to: '/worker/my-submissions', text: '📝 My Submissions', icon: 'file-alt' },
-                    { to: '/worker/withdrawals', text: '💰 Withdrawals', icon: 'wallet' },
+                    { to: '/worker', text: 'Dashboard Home', icon: LayoutDashboard },
+                    { to: '/worker/task-list', text: 'Available Tasks', icon: ListTodo },
+                    { to: '/worker/my-submissions', text: 'My Submissions', icon: CheckSquare },
+                    { to: '/worker/withdrawals', text: 'Withdrawals', icon: Wallet },
                 ];
             case 'buyer':
                 return [
-                    { to: '/buyer', text: '📊 Dashboard Home', icon: 'home' },
-                    { to: '/buyer/add-task', text: '➕ Add New Tasks', icon: 'plus-circle' },
-                    { to: '/buyer/my-tasks', text: '📋 My Tasks', icon: 'list-ul' },
-                    { to: '/buyer/purchase-coin', text: '💎 Purchase Coin', icon: 'coins' },
-                    { to: '/buyer/payment-history', text: '📜 Payment History', icon: 'history' },
+                    { to: '/buyer', text: 'Dashboard Home', icon: LayoutDashboard },
+                    { to: '/buyer/add-task', text: 'Add New Tasks', icon: PlusCircle },
+                    { to: '/buyer/my-tasks', text: 'My Tasks', icon: ClipboardList },
+                    { to: '/buyer/purchase-coin', text: 'Purchase Coin', icon: Coins },
+                    { to: '/buyer/payment-history', text: 'Payment History', icon: History },
                 ];
             case 'admin':
                 return [
-                    { to: '/admin', text: '📊 Dashboard Home', icon: 'home' },
-                    { to: '/admin/manage-users', text: '👥 Manage Users', icon: 'users' },
-                    { to: '/admin/manage-tasks', text: '⚙️ Manage Tasks', icon: 'tasks' },
+                    { to: '/admin', text: 'Dashboard Home', icon: LayoutDashboard },
+                    { to: '/admin/manage-users', text: 'Manage Users', icon: Users },
+                    { to: '/admin/manage-tasks', text: 'Manage Tasks', icon: Settings },
                 ];
             default:
                 return [];
@@ -80,35 +93,42 @@ const Sidebar = ({ isOpen, onClose }) => {
                         className="sidebar-close-btn"
                         style={{ background: 'none', border: 'none', fontSize: '20px', color: 'var(--text-secondary)', cursor: 'pointer', display: 'none' }}
                     >
-                        ✕
+                        <X size={20} />
                     </button>
                 </div>
 
-                {links.map((link) => (
-                    <NavLink
-                        key={link.to}
-                        to={link.to}
-                        end={link.to === '/worker' || link.to === '/buyer' || link.to === '/admin'}
-                        className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
-                        onClick={() => { if (window.innerWidth < 1024) onClose(); }}
-                        style={({ isActive }) => ({
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '12px',
-                            padding: '12px 16px',
-                            borderRadius: '12px',
-                            textDecoration: 'none',
-                            color: isActive ? 'white' : 'var(--text-secondary)',
-                            background: isActive ? 'linear-gradient(135deg, var(--primary-color), var(--secondary-color))' : 'transparent',
-                            fontWeight: isActive ? '600' : '500',
-                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                            boxShadow: isActive ? '0 4px 15px rgba(99, 102, 241, 0.3)' : 'none'
-                        })}
-                    >
-                        <span style={{ fontSize: '18px' }}>{link.text.split(' ')[0]}</span>
-                        <span>{link.text.split(' ').slice(1).join(' ')}</span>
-                    </NavLink>
-                ))}
+                {links.map((link) => {
+                    const Icon = link.icon;
+                    return (
+                        <NavLink
+                            key={link.to}
+                            to={link.to}
+                            end={link.to === '/worker' || link.to === '/buyer' || link.to === '/admin'}
+                            className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
+                            style={({ isActive }) => ({
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '12px',
+                                padding: '12px 16px',
+                                borderRadius: '12px',
+                                textDecoration: 'none',
+                                color: isActive ? 'white' : 'var(--text-secondary)',
+                                background: isActive ? 'linear-gradient(135deg, var(--primary-color), var(--secondary-color))' : 'transparent',
+                                fontWeight: isActive ? '600' : '500',
+                                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                                boxShadow: isActive ? '0 4px 15px rgba(99, 102, 241, 0.3)' : 'none'
+                            })}
+                            onClick={() => { if (window.innerWidth < 1024) onClose(); }}
+                        >
+                            {({ isActive }) => (
+                                <>
+                                    <Icon size={20} strokeWidth={isActive ? 2.5 : 2} />
+                                    <span>{link.text}</span>
+                                </>
+                            )}
+                        </NavLink>
+                    );
+                })}
 
                 <div style={{ marginTop: 'auto', padding: '20px 12px', borderTop: '1px solid var(--border-color)' }}>
                     <p style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>

@@ -3,6 +3,7 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Pagination, Navigation, EffectFade } from 'swiper/modules';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 // Import Swiper styles
 import 'swiper/css';
@@ -11,6 +12,12 @@ import 'swiper/css/navigation';
 import 'swiper/css/effect-fade';
 
 const HeroSlider = () => {
+    const { user } = useAuth();
+
+    const dashboardLink = user?.role === 'worker' ? '/worker' :
+        user?.role === 'buyer' ? '/buyer' :
+            user?.role === 'admin' ? '/admin' : '/';
+
     const slides = [
         {
             id: 1,
@@ -113,7 +120,7 @@ const HeroSlider = () => {
                                         {slide.subtitle}
                                     </p>
                                     <div style={{ display: 'flex', gap: '20px', justifyContent: 'center' }}>
-                                        <Link to="/register" className="btn btn-primary" style={{ padding: '16px 32px', fontSize: '18px' }}>
+                                        <Link to={user ? dashboardLink : "/register"} className="btn btn-primary" style={{ padding: '16px 32px', fontSize: '18px' }}>
                                             Get Started
                                         </Link>
                                     </div>

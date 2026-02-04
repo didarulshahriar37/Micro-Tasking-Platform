@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { taskService } from '../services/api';
 import { Link } from 'react-router-dom';
 import DashboardLayout from '../components/DashboardLayout';
+import LoadingSpinner from '../components/LoadingSpinner';
+import { Coins, User, Calendar, Users, Search } from 'lucide-react';
 
 const TaskList = () => {
     const [tasks, setTasks] = useState([]);
@@ -56,14 +58,20 @@ const TaskList = () => {
                                         fontSize: '14px',
                                         fontWeight: '700'
                                     }}>
-                                        💰 {task.payable_amount}
+                                        <Coins size={14} /> {task.payable_amount}
                                     </span>
                                 </div>
 
                                 <div style={{ color: 'var(--text-secondary)', fontSize: '14px', marginBottom: '20px' }}>
-                                    <div style={{ marginBottom: '8px' }}>👤 Buyer: <strong>{task.buyer?.name}</strong></div>
-                                    <div style={{ marginBottom: '8px' }}>📅 Deadline: {new Date(task.deadline).toLocaleDateString()}</div>
-                                    <div style={{ marginBottom: '8px' }}>👥 Required: {task.available_workers} slots left</div>
+                                    <div style={{ marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                        <User size={14} /> Buyer: <strong>{task.buyer?.name}</strong>
+                                    </div>
+                                    <div style={{ marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                        <Calendar size={14} /> Deadline: {new Date(task.deadline).toLocaleDateString()}
+                                    </div>
+                                    <div style={{ marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                        <Users size={14} /> Required: {task.available_workers} slots left
+                                    </div>
                                 </div>
 
                                 <Link to={`/worker/task/${task._id}`} className="btn btn-primary" style={{ textAlign: 'center', marginTop: 'auto' }}>
@@ -74,7 +82,9 @@ const TaskList = () => {
                     ))
                 ) : (
                     <div style={{ gridColumn: 'span 3', textAlign: 'center', padding: '100px', color: 'var(--text-secondary)' }}>
-                        <div style={{ fontSize: '64px', marginBottom: '24px' }}>🔍</div>
+                        <div style={{ fontSize: '64px', marginBottom: '24px', color: 'var(--text-secondary)', display: 'flex', justifyContent: 'center' }}>
+                            <Search size={64} />
+                        </div>
                         <h3>No tasks available at the moment.</h3>
                         <p>Check back later for new opportunities!</p>
                     </div>

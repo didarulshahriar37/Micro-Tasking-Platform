@@ -2,6 +2,17 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
+import {
+    Bell,
+    Sun,
+    Moon,
+    Coins,
+    LogOut,
+    LayoutDashboard,
+    Menu,
+    X,
+    MessageSquare
+} from 'lucide-react';
 
 const Navbar = () => {
     const { user, logout } = useAuth();
@@ -72,7 +83,6 @@ const Navbar = () => {
 
     const handleLogout = () => {
         logout();
-        navigate('/login');
     };
 
     const dashboardLink = user?.role === 'worker' ? '/worker' :
@@ -170,7 +180,7 @@ const Navbar = () => {
                                         position: 'relative'
                                     }}
                                 >
-                                    🔔
+                                    <Bell size={18} />
                                     {unreadCount > 0 && (
                                         <span style={{
                                             position: 'absolute',
@@ -228,7 +238,9 @@ const Navbar = () => {
                                                             gap: '10px'
                                                         }}
                                                     >
-                                                        <div style={{ fontSize: '16px' }}>{notif.type === 'payment' ? '💰' : '🔔'}</div>
+                                                        <div style={{ fontSize: '16px', color: notif.type === 'payment' ? '#f59e0b' : 'var(--primary-color)' }}>
+                                                            {notif.type === 'payment' ? <Coins size={16} /> : <Bell size={16} />}
+                                                        </div>
                                                         <div style={{ fontSize: '12px', flex: 1 }}>{notif.message}</div>
                                                     </div>
                                                 ))
@@ -258,7 +270,7 @@ const Navbar = () => {
                                 transition: 'all 0.2s'
                             }}
                         >
-                            {theme === 'dark' ? '☀️' : '🌙'}
+                            {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
                         </button>
                     </div>
 
@@ -269,7 +281,7 @@ const Navbar = () => {
                                 <Link to="/login" className="btn btn-outline" style={{ border: 'none', color: 'var(--text-primary)', padding: '10px 20px', fontWeight: '600' }}>
                                     Login
                                 </Link>
-                                <Link to="/register" className="btn btn-primary" style={{ padding: '10px 24px', borderRadius: '10px', fontWeight: '700', boxShadow: '0 4px 10px rgba(99, 102, 241, 0.2)' }}>
+                                <Link to={user ? dashboardLink : "/register"} className="btn btn-primary" style={{ padding: '10px 24px', borderRadius: '10px', fontWeight: '700', boxShadow: '0 4px 10px rgba(99, 102, 241, 0.2)' }}>
                                     Get Started
                                 </Link>
                             </div>
@@ -289,7 +301,7 @@ const Navbar = () => {
                                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
                                         <span className="nav-balance-label" style={{ fontSize: '11px', color: 'var(--text-secondary)', textTransform: 'uppercase', fontWeight: '700', letterSpacing: '0.5px' }}>Balance</span>
                                         <span style={{ fontSize: '14px', fontWeight: '800', color: '#10b981', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                            <span style={{ fontSize: '16px' }}>💰</span> {user.coins}
+                                            <Coins size={14} color="#10b981" /> {user.coins}
                                         </span>
                                     </div>
 
@@ -361,7 +373,7 @@ const Navbar = () => {
                                         e.currentTarget.style.transform = 'translateY(0)';
                                     }}
                                 >
-                                    Logout
+                                    <LogOut size={16} /> Logout
                                 </button>
                             </div>
                         )}
@@ -377,7 +389,7 @@ const Navbar = () => {
                         cursor: 'pointer',
                         padding: '4px'
                     }}>
-                        {isOpen ? '✕' : '☰'}
+                        {isOpen ? <X size={24} /> : <Menu size={24} />}
                     </button>
                 </div>
             </div>
@@ -400,8 +412,8 @@ const Navbar = () => {
                 }}>
                     {user ? (
                         <>
-                            <Link to={dashboardLink} style={{ textDecoration: 'none', color: 'var(--text-primary)', fontWeight: '600', padding: '12px', background: 'var(--bg-secondary)', borderRadius: '12px' }}>
-                                📊 Dashboard Home
+                            <Link to={dashboardLink} style={{ textDecoration: 'none', color: 'var(--text-primary)', fontWeight: '600', padding: '12px', background: 'var(--bg-secondary)', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <LayoutDashboard size={18} /> Dashboard Home
                             </Link>
                             <button onClick={handleLogout} className="btn btn-danger" style={{ width: '100%', height: '48px', justifyContent: 'center' }}>
                                 Logout
