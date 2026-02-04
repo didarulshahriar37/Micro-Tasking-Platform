@@ -86,7 +86,7 @@ const Sidebar = ({ isOpen, onClose }) => {
             >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px', padding: '0 12px' }}>
                     <h3 style={{ fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-secondary)' }}>
-                        Navigation
+                        DASHBOARD
                     </h3>
                     <button
                         onClick={onClose}
