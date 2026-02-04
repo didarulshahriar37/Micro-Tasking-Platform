@@ -39,28 +39,47 @@ router.get('/', auth, authorize('admin'), async (req, res) => {
     }
 });
 
-// Get platform statistics (Admin only)
-router.get('/stats', auth, authorize('admin'), async (req, res) => {
+// Get platform statistics
+router.get('/stats', auth, async (req, res) => {
     try {
-        const totalUsers = await User.countDocuments();
-        const totalWorkers = await User.countDocuments({ role: 'worker' });
-        const totalBuyers = await User.countDocuments({ role: 'buyer' });
-        const totalTasks = await Task.countDocuments();
-        const activeTasks = await Task.countDocuments({ status: 'active' });
-        const totalSubmissions = await Submission.countDocuments();
-        const pendingSubmissions = await Submission.countDocuments({ status: 'pending' });
+        if (req.user.role === 'admin') {
+            const totalUsers = await User.countDocuments();
+            const totalWorkers = await User.countDocuments({ role: 'worker' });
+            const totalBuyers = await User.countDocuments({ role: 'buyer' });
+            const totalTasks = await Task.countDocuments();
+            const activeTasks = await Task.countDocuments({ status: 'active' });
+            const totalSubmissions = await Submission.countDocuments();
+            const pendingSubmissions = await Submission.countDocuments({ status: 'pending' });
 
-        res.json({
-            stats: {
-                totalUsers,
-                totalWorkers,
-                totalBuyers,
-                totalTasks,
-                activeTasks,
-                totalSubmissions,
-                pendingSubmissions
-            }
-        });
+            return res.json({
+                stats: {
+                    totalUsers,
+                    totalWorkers,
+                    totalBuyers,
+                    totalTasks,
+                    activeTasks,
+                    totalSubmissions,
+                    pendingSubmissions
+                }
+            });
+        } else if (req.user.role === 'worker') {
+            const totalSubmissions = await Submission.countDocuments({ worker: req.user._id });
+            const totalPendingSubmissions = await Submission.countDocuments({ worker: req.user._id, status: 'pending' });
+
+            const approvedSubmissions = await Submission.find({ worker: req.user._id, status: 'approved' });
+            const totalEarnings = approvedSubmissions.reduce((sum, sub) => sum + (sub.payable_amount || 0), 0);
+
+            return res.json({
+                stats: {
+                    totalSubmissions,
+                    totalPendingSubmissions,
+                    totalEarnings
+                }
+            });
+        } else if (req.user.role === 'buyer') {
+            // Add buyer stats if needed later
+            res.json({ message: 'Buyer stats not implemented yet' });
+        }
     } catch (error) {
         res.status(500).json({ error: error.message });
     }

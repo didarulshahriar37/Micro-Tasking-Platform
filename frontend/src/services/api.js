@@ -58,6 +58,13 @@ export const transactionService = {
     withdrawCoins: (amount) => api.post('/transactions/withdraw', { amount })
 };
 
+// Withdrawal services
+export const withdrawalService = {
+    requestWithdrawal: (data) => api.post('/withdrawals', data),
+    getMyWithdrawals: () => api.get('/withdrawals/my'),
+    getAllWithdrawals: () => api.get('/withdrawals')
+};
+
 // User services
 export const userService = {
     getAllUsers: (params) => api.get('/users', { params }),

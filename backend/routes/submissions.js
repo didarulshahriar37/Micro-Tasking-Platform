@@ -55,10 +55,16 @@ router.post('/', auth, authorize('worker'), async (req, res) => {
 
         // Create submission
         const submission = new Submission({
-            task: taskId,
+            task_id: taskId,
+            task_title: task.title,
+            payable_amount: task.payable_amount,
             worker: req.user._id,
+            worker_email: req.user.email,
+            worker_name: req.user.name,
+            Buyer_name: task.buyer.name,
+            Buyer_email: task.buyer.email,
             submission_details,
-            attachments: attachments || []
+            status: 'pending'
         });
 
         await submission.save();

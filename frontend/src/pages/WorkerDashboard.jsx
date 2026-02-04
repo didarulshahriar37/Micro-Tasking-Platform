@@ -1,265 +1,115 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { taskService, submissionService, transactionService } from '../services/api';
+import { userService, submissionService } from '../services/api';
+import DashboardLayout from '../components/DashboardLayout';
+import { motion } from 'framer-motion';
 
 const WorkerDashboard = () => {
-    const { user, logout } = useAuth();
-    const [tasks, setTasks] = useState([]);
-    const [submissions, setSubmissions] = useState([]);
+    const { user } = useAuth();
+    const [stats, setStats] = useState({
+        totalSubmissions: 0,
+        totalPendingSubmissions: 0,
+        totalEarnings: 0
+    });
+    const [approvedSubmissions, setApprovedSubmissions] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [activeTab, setActiveTab] = useState('tasks');
 
     useEffect(() => {
-        fetchData();
+        fetchDashboardData();
     }, []);
 
-    const fetchData = async () => {
+    const fetchDashboardData = async () => {
         try {
-            const [tasksRes, submissionsRes] = await Promise.all([
-                taskService.getAllTasks(),
+            const [statsRes, submissionsRes] = await Promise.all([
+                userService.getStats(),
                 submissionService.getAllSubmissions()
             ]);
-            setTasks(tasksRes.data.tasks);
-            setSubmissions(submissionsRes.data.submissions);
+
+            if (statsRes.data.stats) {
+                setStats(statsRes.data.stats);
+            }
+
+            // Filter approved submissions for the table
+            const approved = submissionsRes.data.submissions.filter(s => s.status === 'approved');
+            setApprovedSubmissions(approved);
         } catch (error) {
-            console.error('Error fetching data:', error);
+            console.error('Error fetching dashboard data:', error);
         } finally {
             setLoading(false);
         }
     };
 
-    const [selectedTask, setSelectedTask] = useState(null);
-
-    // ... existing load logic ...
-
-    const handleViewTask = (task) => {
-        setSelectedTask(task);
-    };
-
-    const handleCloseModal = () => {
-        setSelectedTask(null);
-    };
-
-    const handleSubmitTask = async (e) => {
-        e.preventDefault();
-        const submissionDetails = e.target.submissionDetails.value;
-
-        try {
-            await submissionService.submitTask({
-                taskId: selectedTask._id,
-                submissionDetails
-            });
-            alert('Task submitted successfully!');
-            handleCloseModal();
-            fetchData();
-        } catch (error) {
-            alert(error.response?.data?.error || 'Submission failed');
-        }
-    };
-
-    if (loading) return <div className="loading">Loading...</div>;
+    if (loading) return <DashboardLayout><div className="loading">Loading Dashboard info...</div></DashboardLayout>;
 
     return (
-        <div style={{ minHeight: '100vh', backgroundColor: 'var(--bg-color)' }}>
-            {/* ... Header ... */}
-            <div style={{ backgroundColor: 'var(--card-bg)', boxShadow: 'var(--shadow)', padding: '16px 0' }}>
-                <div className="container flex-between">
-                    <h1 style={{ color: 'var(--primary-color)', fontSize: '24px' }}>Worker Dashboard</h1>
-                    <div className="flex">
-                        <div style={{ padding: '8px 16px', backgroundColor: 'var(--bg-color)', borderRadius: '6px' }}>
-                            <strong>{user.coins}</strong> coins
-                        </div>
-                        <button onClick={logout} className="btn btn-outline">Logout</button>
-                    </div>
+        <DashboardLayout>
+            <div style={{ marginBottom: '40px' }}>
+                <h1 style={{ fontSize: '32px', fontWeight: '800', marginBottom: '8px' }}>
+                    Welcome back, <span style={{ color: 'var(--primary-color)' }}>{user?.name}</span>
+                </h1>
+                <p style={{ color: 'var(--text-secondary)' }}>You are currently viewing your submission stats and earnings.</p>
+            </div>
+
+            {/* Stats Cards */}
+            <div className="grid grid-3" style={{ gap: '24px', marginBottom: '48px' }}>
+                <div className="card" style={{ textAlign: 'center', padding: '32px' }}>
+                    <div style={{ fontSize: '40px', marginBottom: '16px' }}>📝</div>
+                    <h3 style={{ fontSize: '14px', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Total Submission</h3>
+                    <p style={{ fontSize: '36px', fontWeight: '800', color: 'var(--primary-color)' }}>{stats.totalSubmissions}</p>
+                </div>
+                <div className="card" style={{ textAlign: 'center', padding: '32px' }}>
+                    <div style={{ fontSize: '40px', marginBottom: '16px' }}>⏳</div>
+                    <h3 style={{ fontSize: '14px', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Pending Submissions</h3>
+                    <p style={{ fontSize: '36px', fontWeight: '800', color: '#f59e0b' }}>{stats.totalPendingSubmissions}</p>
+                </div>
+                <div className="card" style={{ textAlign: 'center', padding: '32px' }}>
+                    <div style={{ fontSize: '40px', marginBottom: '16px' }}>💰</div>
+                    <h3 style={{ fontSize: '14px', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Total Earning</h3>
+                    <p style={{ fontSize: '36px', fontWeight: '800', color: '#34d399' }}>💰 {stats.totalEarnings}</p>
                 </div>
             </div>
 
-            <div className="container" style={{ marginTop: '24px' }}>
-                {/* ... Stats Cards ... */}
-                <div className="grid grid-3 mb-3">
-                    <div className="card">
-                        <h3 style={{ fontSize: '14px', color: 'var(--text-secondary)', marginBottom: '8px' }}>Total Earnings</h3>
-                        <p style={{ fontSize: '28px', fontWeight: 'bold', color: 'var(--secondary-color)' }}>
-                            {user.totalEarnings} coins
-                        </p>
-                    </div>
-                    <div className="card">
-                        <h3 style={{ fontSize: '14px', color: 'var(--text-secondary)', marginBottom: '8px' }}>Completed Tasks</h3>
-                        <p style={{ fontSize: '28px', fontWeight: 'bold', color: 'var(--primary-color)' }}>
-                            {user.completedTasks}
-                        </p>
-                    </div>
-                    <div className="card">
-                        <h3 style={{ fontSize: '14px', color: 'var(--text-secondary)', marginBottom: '8px' }}>Available Balance</h3>
-                        <p style={{ fontSize: '28px', fontWeight: 'bold' }}>{user.coins} coins</p>
-                        <button onClick={handleWithdraw} className="btn btn-secondary mt-2" style={{ fontSize: '12px' }}>
-                            Withdraw
-                        </button>
-                    </div>
-                </div>
-
-                {/* Tabs */}
-                <div className="card">
-                    <div style={{ borderBottom: '1px solid var(--border-color)', marginBottom: '20px' }}>
-                        <button
-                            onClick={() => setActiveTab('tasks')}
-                            style={{
-                                padding: '12px 24px',
-                                border: 'none',
-                                background: 'none',
-                                borderBottom: activeTab === 'tasks' ? '2px solid var(--primary-color)' : 'none',
-                                color: activeTab === 'tasks' ? 'var(--primary-color)' : 'var(--text-secondary)',
-                                fontWeight: activeTab === 'tasks' ? '600' : '400',
-                                cursor: 'pointer'
-                            }}
-                        >
-                            Available Tasks
-                        </button>
-                        <button
-                            onClick={() => setActiveTab('submissions')}
-                            style={{
-                                padding: '12px 24px',
-                                border: 'none',
-                                background: 'none',
-                                borderBottom: activeTab === 'submissions' ? '2px solid var(--primary-color)' : 'none',
-                                color: activeTab === 'submissions' ? 'var(--primary-color)' : 'var(--text-secondary)',
-                                fontWeight: activeTab === 'submissions' ? '600' : '400',
-                                cursor: 'pointer'
-                            }}
-                        >
-                            My Submissions
-                        </button>
-                    </div>
-
-                    {activeTab === 'tasks' && (
-                        <div>
-                            <h2 style={{ marginBottom: '16px' }}>Available Tasks</h2>
-                            {tasks.length === 0 ? (
-                                <p style={{ color: 'var(--text-secondary)' }}>No tasks available at the moment.</p>
+            {/* Approved Submissions Table */}
+            <div style={{ marginBottom: '24px' }}>
+                <h2 style={{ fontSize: '24px', fontWeight: '700', marginBottom: '16px' }}>Approved Submissions</h2>
+                <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+                        <thead style={{ background: 'rgba(255,255,255,0.02)', borderBottom: '1px solid var(--border-color)' }}>
+                            <tr>
+                                <th style={{ padding: '20px' }}>Task Title</th>
+                                <th style={{ padding: '20px' }}>Payable Amount</th>
+                                <th style={{ padding: '20px' }}>Buyer Name</th>
+                                <th style={{ padding: '20px', textAlign: 'right' }}>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {approvedSubmissions.length === 0 ? (
+                                <tr>
+                                    <td colSpan="4" style={{ padding: '60px', textAlign: 'center', color: 'var(--text-secondary)' }}>
+                                        No approved submissions yet. Start earning!
+                                    </td>
+                                </tr>
                             ) : (
-                                <div className="grid grid-2">
-                                    {tasks.map((task) => (
-                                        <div key={task._id} className="card" style={{ border: '1px solid var(--border-color)' }}>
-                                            <h3 style={{ marginBottom: '8px' }}>{task.title}</h3>
-                                            <p style={{ color: 'var(--text-secondary)', fontSize: '14px', marginBottom: '12px' }}>
-                                                {task.description.substring(0, 100)}...
-                                            </p>
-                                            <div className="flex-between" style={{ marginBottom: '12px' }}>
-                                                <span className="badge badge-success">{task.rewardPerTask} coins</span>
-                                                <span style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>
-                                                    {task.availableSlots} slots left
-                                                </span>
-                                            </div>
-                                            <button
-                                                onClick={() => handleViewTask(task)}
-                                                className="btn btn-primary"
-                                                style={{ width: '100%', fontSize: '14px' }}
-                                            >
-                                                View & Submit
-                                            </button>
-                                        </div>
-                                    ))}
-                                </div>
+                                approvedSubmissions.map((sub) => (
+                                    <tr key={sub._id} style={{ borderBottom: '1px solid var(--border-color)' }}>
+                                        <td style={{ padding: '20px' }}>
+                                            <div style={{ fontWeight: '600' }}>{sub.task_title || sub.task?.title}</div>
+                                        </td>
+                                        <td style={{ padding: '20px' }}>
+                                            <span style={{ color: '#34d399', fontWeight: '600' }}>💰 {sub.payable_amount || sub.task?.payable_amount}</span>
+                                        </td>
+                                        <td style={{ padding: '20px' }}>{sub.Buyer_name || sub.task?.buyer?.name}</td>
+                                        <td style={{ padding: '20px', textAlign: 'right' }}>
+                                            <span className="badge badge-success" style={{ padding: '6px 12px', fontSize: '12px' }}>Approved</span>
+                                        </td>
+                                    </tr>
+                                ))
                             )}
-                        </div>
-                    )}
-
-                    {activeTab === 'submissions' && (
-                        <div>
-                            <h2 style={{ marginBottom: '16px' }}>My Submissions</h2>
-                            {submissions.length === 0 ? (
-                                <p style={{ color: 'var(--text-secondary)' }}>You haven't submitted any tasks yet.</p>
-                            ) : (
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                                    {submissions.map((submission) => (
-                                        <div key={submission._id} className="card" style={{ border: '1px solid var(--border-color)' }}>
-                                            <div className="flex-between">
-                                                <div>
-                                                    <h3 style={{ marginBottom: '4px' }}>{submission.task?.title}</h3>
-                                                    <p style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>
-                                                        Submitted: {new Date(submission.createdAt).toLocaleDateString()}
-                                                    </p>
-                                                </div>
-                                                <span className={`badge badge-${submission.status === 'approved' ? 'success' :
-                                                    submission.status === 'rejected' ? 'danger' : 'warning'
-                                                    }`}>
-                                                    {submission.status}
-                                                </span>
-                                            </div>
-                                            {submission.reviewNote && (
-                                                <p style={{ marginTop: '12px', fontSize: '14px', fontStyle: 'italic' }}>
-                                                    Review: {submission.reviewNote}
-                                                </p>
-                                            )}
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-                    )}
+                        </tbody>
+                    </table>
                 </div>
             </div>
-
-            {/* Task Detail Modal */}
-            {selectedTask && (
-                <div style={{
-                    position: 'fixed',
-                    top: 0, left: 0, right: 0, bottom: 0,
-                    backgroundColor: 'rgba(0,0,0,0.5)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    zIndex: 2000,
-                    padding: '20px'
-                }}>
-                    <div className="card" style={{ maxWidth: '600px', width: '100%', maxHeight: '90vh', overflowY: 'auto' }}>
-                        <div className="flex-between mb-3">
-                            <h2 style={{ fontSize: '20px' }}>{selectedTask.title}</h2>
-                            <button onClick={handleCloseModal} style={{ background: 'none', border: 'none', fontSize: '24px', cursor: 'pointer' }}>×</button>
-                        </div>
-
-                        <div className="mb-3">
-                            <h4 style={{ marginBottom: '8px' }}>Description</h4>
-                            <p style={{ color: 'var(--text-secondary)', lineHeight: '1.6' }}>{selectedTask.description}</p>
-                        </div>
-
-                        <div className="grid grid-2 mb-3">
-                            <div>
-                                <h4 style={{ marginBottom: '8px' }}>Reward</h4>
-                                <span className="badge badge-success" style={{ fontSize: '14px' }}>{selectedTask.rewardPerTask} coins</span>
-                            </div>
-                            <div>
-                                <h4 style={{ marginBottom: '8px' }}>Deadline</h4>
-                                <p style={{ fontSize: '14px' }}>{new Date(selectedTask.deadline).toLocaleDateString()}</p>
-                            </div>
-                        </div>
-
-                        <div className="mb-3">
-                            <h4 style={{ marginBottom: '8px' }}>Requirements</h4>
-                            <p style={{ backgroundColor: '#f3f4f6', padding: '12px', borderRadius: '6px', fontSize: '14px' }}>
-                                {selectedTask.requirements || 'No specific requirements mentioned.'}
-                            </p>
-                        </div>
-
-                        <form onSubmit={handleSubmitTask}>
-                            <div className="input-group">
-                                <label>Submission Details</label>
-                                <textarea
-                                    name="submissionDetails"
-                                    required
-                                    rows="4"
-                                    placeholder="Enter your submission details here..."
-                                ></textarea>
-                            </div>
-                            <div className="flex" style={{ justifyContent: 'flex-end', gap: '12px' }}>
-                                <button type="button" onClick={handleCloseModal} className="btn btn-outline">Cancel</button>
-                                <button type="submit" className="btn btn-primary">Submit Task</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            )}
-        </div>
+        </DashboardLayout>
     );
 };
 

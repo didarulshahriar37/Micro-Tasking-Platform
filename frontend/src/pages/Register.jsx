@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import axios from 'axios';
 
 const Register = () => {
     const [formData, setFormData] = useState({
@@ -13,6 +14,7 @@ const Register = () => {
     });
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [imageUploading, setImageUploading] = useState(false);
     const { register, googleLogin } = useAuth();
     const navigate = useNavigate();
 
@@ -38,6 +40,35 @@ const Register = () => {
             ...formData,
             [e.target.name]: e.target.value
         });
+    };
+
+    const handleImageUpload = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        setImageUploading(true);
+        setError('');
+
+        const imgData = new FormData();
+        imgData.append('image', file);
+
+        try {
+            const response = await axios.post(
+                `https://api.imgbb.com/1/upload?key=${import.meta.env.VITE_IMGBB_API_KEY}`,
+                imgData
+            );
+            if (response.data.success) {
+                setFormData(prev => ({
+                    ...prev,
+                    profileImage: response.data.data.url
+                }));
+            }
+        } catch (err) {
+            console.error('Image upload failed:', err);
+            setError('Image upload failed. Make sure your ImgBB API key is correct.');
+        } finally {
+            setImageUploading(false);
+        }
     };
 
     const validatePassword = (pass) => {
@@ -78,7 +109,9 @@ const Register = () => {
                 navigate('/buyer');
             }
         } catch (err) {
-            setError(err.response?.data?.error || 'Registration failed. Please try again.');
+            console.error('Registration error detail:', err);
+            const errorMsg = err.response?.data?.error || err.message || 'Registration failed. Please try again.';
+            setError(errorMsg);
         } finally {
             setLoading(false);
         }
@@ -134,15 +167,24 @@ const Register = () => {
                     </div>
 
                     <div className="input-group">
-                        <label>Profile Picture URL</label>
-                        <input
-                            type="url"
-                            name="profileImage"
-                            value={formData.profileImage}
-                            onChange={handleChange}
-                            required
-                            placeholder="https://example.com/photo.jpg"
-                        />
+                        <label>Profile Picture</label>
+                        <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                            <input
+                                type="file"
+                                accept="image/*"
+                                onChange={handleImageUpload}
+                                required
+                                style={{ flex: 1 }}
+                            />
+                            {formData.profileImage && (
+                                <img
+                                    src={formData.profileImage}
+                                    alt="Preview"
+                                    style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover' }}
+                                />
+                            )}
+                        </div>
+                        {imageUploading && <p style={{ fontSize: '12px', color: 'var(--primary-color)', marginTop: '4px' }}>Uploading image...</p>}
                     </div>
 
                     <div className="grid grid-2" style={{ gap: '16px' }}>
@@ -186,9 +228,9 @@ const Register = () => {
                         type="submit"
                         className="btn btn-primary"
                         style={{ width: '100%', marginTop: '12px', height: '48px', justifyContent: 'center' }}
-                        disabled={loading}
+                        disabled={loading || imageUploading}
                     >
-                        {loading ? 'Creating Account...' : 'Register Now'}
+                        {loading ? 'Creating Account...' : (imageUploading ? 'Uploading Image...' : 'Register Now')}
                     </button>
 
                     <div style={{ textAlign: 'center', margin: '20px 0', position: 'relative' }}>

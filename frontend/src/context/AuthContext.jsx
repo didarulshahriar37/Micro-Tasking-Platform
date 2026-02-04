@@ -1,6 +1,6 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { authService } from '../services/api';
-import { signInWithPopup } from 'firebase/auth';
+import { signInWithPopup, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'firebase/auth';
 import { auth, googleProvider } from '../firebase/firebase.config';
 
 const AuthContext = createContext(null);
@@ -27,6 +27,14 @@ export const AuthProvider = ({ children }) => {
     }, []);
 
     const login = async (email, password) => {
+        // Sign in to Firebase first
+        try {
+            await signInWithEmailAndPassword(auth, email, password);
+        } catch (error) {
+            console.error('Firebase Login Error:', error);
+            // We still proceed to backend login unless we want to strictly sync
+        }
+
         const response = await authService.login({ email, password });
         const { user: userData, token } = response.data;
 
@@ -38,6 +46,17 @@ export const AuthProvider = ({ children }) => {
     };
 
     const register = async (name, email, password, role, profileImage) => {
+        // Create user in Firebase first
+        try {
+            await createUserWithEmailAndPassword(auth, email, password);
+        } catch (error) {
+            console.error('Firebase Registration Error:', error);
+            if (error.code === 'auth/email-already-in-use') {
+                throw new Error('Email already registered in Firebase');
+            }
+            throw error;
+        }
+
         const response = await authService.register({ name, email, password, role, profileImage });
         const { user: userData, token } = response.data;
 
@@ -72,7 +91,12 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
-    const logout = () => {
+    const logout = async () => {
+        try {
+            await signOut(auth);
+        } catch (error) {
+            console.error('Firebase Logout Error:', error);
+        }
         authService.logout();
         setUser(null);
     };

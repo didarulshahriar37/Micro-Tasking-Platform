@@ -1,0 +1,24 @@
+[dotenv@17.2.3] injecting env (4) from .env -- tip: ΓÜÖ∩╕Å  suppress all logs with { quiet: true }
+Connected to MongoDB
+Creating user...
+Saving user...
+DEBUG: User pre-save hook triggered
+DEBUG: next is a object
+DEBUG: Hashing password...
+DEBUG: Password hashed, calling next()
+DEBUG: Hook error: TypeError: next is not a function
+    at model.<anonymous> (D:\Ph projects\PH-Assignment-13\backend\models\User.js:77:9)
+    at Kareem.execPre (D:\Ph projects\PH-Assignment-13\backend\node_modules\kareem\index.js:63:39)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async model.$__save (D:\Ph projects\PH-Assignment-13\backend\node_modules\mongoose\lib\model.js:369:5)
+    at async model.save (D:\Ph projects\PH-Assignment-13\backend\node_modules\mongoose\lib\model.js:609:5)
+    at async testRegister (D:\Ph projects\PH-Assignment-13\backend\test_register.js:22:9)
+DEBUG: next is not a function!
+Registration failed:
+TypeError: next is not a function
+    at model.<anonymous> (D:\Ph projects\PH-Assignment-13\backend\models\User.js:77:9)
+    at Kareem.execPre (D:\Ph projects\PH-Assignment-13\backend\node_modules\kareem\index.js:63:39)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async model.$__save (D:\Ph projects\PH-Assignment-13\backend\node_modules\mongoose\lib\model.js:369:5)
+    at async model.save (D:\Ph projects\PH-Assignment-13\backend\node_modules\mongoose\lib\model.js:609:5)
+    at async testRegister (D:\Ph projects\PH-Assignment-13\backend\test_register.js:22:9)

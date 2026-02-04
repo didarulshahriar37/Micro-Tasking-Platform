@@ -3,16 +3,50 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { taskService } from '../services/api';
 import DashboardLayout from '../components/DashboardLayout';
+import axios from 'axios';
 
 const AddTask = () => {
     const { user, updateUser } = useAuth();
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const [imageUploading, setImageUploading] = useState(false);
+    const [taskImageUrl, setTaskImageUrl] = useState('');
+
+    const handleImageUpload = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        setImageUploading(true);
+        setError('');
+
+        const imgData = new FormData();
+        imgData.append('image', file);
+
+        try {
+            const response = await axios.post(
+                `https://api.imgbb.com/1/upload?key=${import.meta.env.VITE_IMGBB_API_KEY}`,
+                imgData
+            );
+            if (response.data.success) {
+                setTaskImageUrl(response.data.data.url);
+            }
+        } catch (err) {
+            console.error('Image upload failed:', err);
+            setError('Image upload failed. Make sure your ImgBB API key is correct.');
+        } finally {
+            setImageUploading(false);
+        }
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
+
+        if (imageUploading) {
+            setError('Please wait for the image to finish uploading.');
+            return;
+        }
 
         const formData = new FormData(e.target);
         const required_workers = Number(formData.get('required_workers'));
@@ -33,7 +67,7 @@ const AddTask = () => {
             payable_amount,
             deadline: formData.get('completion_date'),
             submission_info: formData.get('submission_info'),
-            task_image_url: formData.get('task_image_url')
+            task_image_url: taskImageUrl
         };
 
         try {
@@ -119,13 +153,23 @@ const AddTask = () => {
                             />
                         </div>
                         <div className="input-group">
-                            <label>Task Image URL</label>
-                            <input
-                                type="url"
-                                name="task_image_url"
-                                placeholder="https://example.com/image.jpg"
-                                style={{ width: '100%' }}
-                            />
+                            <label>Task Image</label>
+                            <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handleImageUpload}
+                                    style={{ width: '100%' }}
+                                />
+                                {taskImageUrl && (
+                                    <img
+                                        src={taskImageUrl}
+                                        alt="Preview"
+                                        style={{ width: '40px', height: '40px', borderRadius: '8px', objectFit: 'cover' }}
+                                    />
+                                )}
+                            </div>
+                            {imageUploading && <p style={{ fontSize: '12px', color: 'var(--primary-color)', marginTop: '4px' }}>Uploading image...</p>}
                         </div>
                     </div>
 

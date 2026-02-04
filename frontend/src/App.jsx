@@ -14,6 +14,10 @@ import AddTask from './pages/AddTask';
 import MyTasks from './pages/MyTasks';
 import PurchaseCoin from './pages/PurchaseCoin';
 import PaymentHistory from './pages/PaymentHistory';
+import TaskList from './pages/TaskList';
+import TaskDetails from './pages/TaskDetails';
+import MySubmissions from './pages/MySubmissions';
+import Withdrawals from './pages/Withdrawals';
 
 import './App.css';
 
@@ -47,7 +51,13 @@ const AppRoutes = () => {
         path="/worker/*"
         element={
           <ProtectedRoute allowedRoles={['worker']}>
-            <WorkerDashboard />
+            <Routes>
+              <Route index element={<WorkerDashboard />} />
+              <Route path="task-list" element={<TaskList />} />
+              <Route path="task/:id" element={<TaskDetails />} />
+              <Route path="my-submissions" element={<MySubmissions />} />
+              <Route path="withdrawals" element={<Withdrawals />} />
+            </Routes>
           </ProtectedRoute>
         }
       />

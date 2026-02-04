@@ -11,13 +11,25 @@ const submissionSchema = new mongoose.Schema({
         ref: 'User',
         required: true
     },
-    submissionDetails: {
+    task_id: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Task',
+        required: true
+    },
+    task_title: String,
+    payable_amount: Number,
+    worker_email: String,
+    worker_name: String,
+    Buyer_name: String,
+    Buyer_email: String,
+    submission_details: {
         type: String,
         required: [true, 'Submission details are required']
     },
-    attachments: [{
-        type: String
-    }],
+    current_date: {
+        type: Date,
+        default: Date.now
+    },
     status: {
         type: String,
         enum: ['pending', 'approved', 'rejected'],

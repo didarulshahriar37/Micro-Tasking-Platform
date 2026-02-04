@@ -11,7 +11,7 @@ const WorkerSlider = ({ workers }) => {
     return (
         <div style={{ padding: '20px 0 50px' }}>
             <Swiper
-                spaceBetween={30}
+                spaceBetween={40}
                 slidesPerView={1}
                 breakpoints={{
                     640: { slidesPerView: 1 },
@@ -27,7 +27,7 @@ const WorkerSlider = ({ workers }) => {
                 }}
                 modules={[Autoplay, Pagination]}
                 className="workerSwiper"
-                style={{ paddingBottom: '50px' }}
+                style={{ padding: '20px 10px 60px' }}
             >
                 {workers.map((worker, index) => (
                     <SwiperSlide key={index}>
