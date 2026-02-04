@@ -19,7 +19,7 @@ router.get('/', auth, async (req, res) => {
         }
 
         const submissions = await Submission.find(filter)
-            .populate('task', 'title rewardPerTask')
+            .populate('task', 'title payable_amount')
             .populate('worker', 'name email')
             .sort({ createdAt: -1 });
 
@@ -32,7 +32,7 @@ router.get('/', auth, async (req, res) => {
 // Submit a task (Worker only)
 router.post('/', auth, authorize('worker'), async (req, res) => {
     try {
-        const { taskId, submissionDetails, attachments } = req.body;
+        const { taskId, submission_details, attachments } = req.body;
 
         const task = await Task.findById(taskId);
         if (!task) {
@@ -44,7 +44,7 @@ router.post('/', auth, authorize('worker'), async (req, res) => {
             return res.status(400).json({ error: 'Task is not active' });
         }
 
-        if (task.availableSlots <= 0) {
+        if (task.available_workers <= 0) {
             return res.status(400).json({ error: 'No available slots' });
         }
 
@@ -57,14 +57,14 @@ router.post('/', auth, authorize('worker'), async (req, res) => {
         const submission = new Submission({
             task: taskId,
             worker: req.user._id,
-            submissionDetails,
+            submission_details,
             attachments: attachments || []
         });
 
         await submission.save();
 
         // Update task
-        task.availableSlots -= 1;
+        task.available_workers -= 1;
         task.submissionCount += 1;
         await task.save();
 
@@ -130,7 +130,7 @@ router.patch('/:id/review', auth, authorize('buyer'), async (req, res) => {
 
             // Pay worker
             const worker = submission.worker;
-            const reward = submission.task.rewardPerTask;
+            const reward = submission.task.payable_amount;
 
             worker.coins += reward;
             worker.completedTasks += 1;
@@ -160,7 +160,9 @@ router.patch('/:id/review', auth, authorize('buyer'), async (req, res) => {
             });
         } else {
             submission.task.rejectedCount += 1;
-            submission.task.availableSlots += 1; // Return slot
+            // Requirement: "Increase required_workers by 1" - but practically we should increase available_workers 
+            // so someone else can take the spot.
+            submission.task.available_workers += 1;
 
             // Create notification for worker
             await Notification.create({

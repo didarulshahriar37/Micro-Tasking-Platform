@@ -15,17 +15,17 @@ const taskSchema = new mongoose.Schema({
         ref: 'User',
         required: true
     },
-    rewardPerTask: {
+    payable_amount: {
         type: Number,
-        required: [true, 'Reward amount is required'],
+        required: [true, 'Payable amount is required'],
         min: 1
     },
-    totalSlots: {
+    required_workers: {
         type: Number,
-        required: [true, 'Total slots is required'],
+        required: [true, 'Required workers count is required'],
         min: 1
     },
-    availableSlots: {
+    available_workers: {
         type: Number,
         required: true
     },
@@ -34,7 +34,11 @@ const taskSchema = new mongoose.Schema({
         enum: ['survey', 'data-entry', 'testing', 'review', 'social-media', 'other'],
         default: 'other'
     },
-    requirements: {
+    submission_info: {
+        type: String,
+        default: ''
+    },
+    task_image_url: {
         type: String,
         default: ''
     },
@@ -63,10 +67,10 @@ const taskSchema = new mongoose.Schema({
     timestamps: true
 });
 
-// Initialize availableSlots to totalSlots before saving
+// Initialize available_workers to required_workers before saving
 taskSchema.pre('save', function (next) {
     if (this.isNew) {
-        this.availableSlots = this.totalSlots;
+        this.available_workers = this.required_workers;
     }
     next();
 });

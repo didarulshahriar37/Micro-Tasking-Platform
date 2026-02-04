@@ -55,15 +55,15 @@ router.get('/:id', auth, async (req, res) => {
 // Create task (Buyer only)
 router.post('/', auth, authorize('buyer'), async (req, res) => {
     try {
-        const { title, description, rewardPerTask, totalSlots, category, requirements, deadline } = req.body;
+        const { title, description, payable_amount, required_workers, category, submission_info, deadline, task_image_url } = req.body;
 
         // Calculate total cost
-        const totalCost = rewardPerTask * totalSlots;
+        const totalCost = payable_amount * required_workers;
 
         // Check if buyer has enough coins
         if (req.user.coins < totalCost) {
             return res.status(400).json({
-                error: 'Insufficient coins. Please purchase more coins.'
+                error: 'Not available Coin. Purchase Coin'
             });
         }
 
@@ -72,11 +72,12 @@ router.post('/', auth, authorize('buyer'), async (req, res) => {
             title,
             description,
             buyer: req.user._id,
-            rewardPerTask,
-            totalSlots,
+            payable_amount,
+            required_workers,
             category,
-            requirements,
-            deadline
+            submission_info,
+            deadline,
+            task_image_url
         });
 
         await task.save();
@@ -89,39 +90,9 @@ router.post('/', auth, authorize('buyer'), async (req, res) => {
 
         res.status(201).json({
             message: 'Task created successfully',
-            task
+            task,
+            remainingCoins: req.user.coins
         });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// Update task (Buyer only - own tasks)
-router.patch('/:id', auth, authorize('buyer'), async (req, res) => {
-    try {
-        const task = await Task.findById(req.params.id);
-
-        if (!task) {
-            return res.status(404).json({ error: 'Task not found' });
-        }
-
-        // Check if user owns this task
-        if (task.buyer.toString() !== req.user._id.toString()) {
-            return res.status(403).json({ error: 'Not authorized' });
-        }
-
-        const allowedUpdates = ['title', 'description', 'requirements', 'status', 'deadline'];
-        const updates = Object.keys(req.body);
-        const isValidOperation = updates.every(update => allowedUpdates.includes(update));
-
-        if (!isValidOperation) {
-            return res.status(400).json({ error: 'Invalid updates' });
-        }
-
-        updates.forEach(update => task[update] = req.body[update]);
-        await task.save();
-
-        res.json({ message: 'Task updated successfully', task });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -140,15 +111,23 @@ router.delete('/:id', auth, authorize('buyer'), async (req, res) => {
             return res.status(403).json({ error: 'Not authorized' });
         }
 
-        // Can only delete if no approved submissions
-        if (task.approvedCount > 0) {
-            return res.status(400).json({
-                error: 'Cannot delete task with approved submissions'
-            });
-        }
+        // Calculate refill amount: (required_workers * payable_amount) logic
+        // Only refill for the slots that hasn't been COMPLETED/APPROVED.
+        // Based on user: "Increase the coin for unCompleted tasks"
+        const remainingSlots = task.required_workers - task.approvedCount;
+        const refillAmount = remainingSlots * task.payable_amount;
 
         await task.deleteOne();
-        res.json({ message: 'Task deleted successfully' });
+
+        // Refill buyer coins
+        req.user.coins += refillAmount;
+        await req.user.save();
+
+        res.json({
+            message: 'Task deleted successfully',
+            refillAmount,
+            remainingCoins: req.user.coins
+        });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -158,7 +137,7 @@ router.delete('/:id', auth, authorize('buyer'), async (req, res) => {
 router.get('/buyer/my-tasks', auth, authorize('buyer'), async (req, res) => {
     try {
         const tasks = await Task.find({ buyer: req.user._id })
-            .sort({ createdAt: -1 });
+            .sort({ deadline: -1 }); // Show in descending order based on compilation/deadline
 
         res.json({ tasks });
     } catch (error) {

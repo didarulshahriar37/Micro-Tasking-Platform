@@ -1,274 +1,220 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { taskService, submissionService, transactionService } from '../services/api';
+import { taskService, submissionService } from '../services/api';
+import DashboardLayout from '../components/DashboardLayout';
+import { motion } from 'framer-motion';
 
 const BuyerDashboard = () => {
-    const { user, logout } = useAuth();
-    const [tasks, setTasks] = useState([]);
-    const [submissions, setSubmissions] = useState([]);
+    const { user } = useAuth();
+    const [stats, setStats] = useState({
+        totalTasks: 0,
+        pendingWorkers: 0,
+        totalPayments: user?.totalSpent || 0
+    });
+    const [pendingSubmissions, setPendingSubmissions] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [activeTab, setActiveTab] = useState('tasks');
-    const [showCreateForm, setShowCreateForm] = useState(false);
+    const [selectedSubmission, setSelectedSubmission] = useState(null);
 
     useEffect(() => {
-        fetchData();
+        fetchDashboardData();
     }, []);
 
-    const fetchData = async () => {
+    const fetchDashboardData = async () => {
         try {
             const [tasksRes, submissionsRes] = await Promise.all([
-                taskService.getAllTasks(),
+                taskService.getMyTasks(),
                 submissionService.getAllSubmissions()
             ]);
-            setTasks(tasksRes.data.tasks);
-            setSubmissions(submissionsRes.data.submissions);
+
+            const tasks = tasksRes.data.tasks;
+            const submissions = submissionsRes.data.submissions;
+
+            // Calculate stats
+            const totalTasks = tasks.length;
+            const pendingWorkers = tasks.reduce((acc, task) => acc + (task.required_workers - (task.approvedCount || 0)), 0);
+
+            setStats({
+                totalTasks,
+                pendingWorkers,
+                totalPayments: user?.totalSpent || 0
+            });
+
+            // Filter pending submissions
+            setPendingSubmissions(submissions.filter(s => s.status === 'pending'));
         } catch (error) {
-            console.error('Error fetching data:', error);
+            console.error('Error fetching dashboard data:', error);
         } finally {
             setLoading(false);
         }
     };
 
-    const handlePurchaseCoins = async () => {
-        const amount = prompt('Enter amount of coins to purchase:');
-        if (amount && parseFloat(amount) > 0) {
-            try {
-                await transactionService.purchaseCoins(parseFloat(amount));
-                alert('Coins purchased successfully!');
-                window.location.reload();
-            } catch (error) {
-                alert(error.response?.data?.error || 'Purchase failed');
-            }
-        }
-    };
-
-    const handleReview = async (submissionId, status) => {
-        const reviewNote = prompt(`Enter review note (optional):`);
+    const handleApprove = async (submissionId) => {
         try {
-            await submissionService.reviewSubmission(submissionId, { status, reviewNote });
-            alert(`Submission ${status}!`);
-            fetchData();
+            await submissionService.reviewSubmission(submissionId, { status: 'approved' });
+            alert('Submission Approved! Worker has been paid.');
+            fetchDashboardData();
         } catch (error) {
-            alert(error.response?.data?.error || 'Review failed');
+            alert('Error approving submission');
         }
     };
 
-    if (loading) return <div className="loading">Loading...</div>;
+    const handleReject = async (submissionId) => {
+        try {
+            await submissionService.reviewSubmission(submissionId, { status: 'rejected' });
+            alert('Submission Rejected.');
+            fetchDashboardData();
+        } catch (error) {
+            alert('Error rejecting submission');
+        }
+    };
+
+    if (loading) return <DashboardLayout><div className="loading">Loading Dashboard info...</div></DashboardLayout>;
 
     return (
-        <div style={{ minHeight: '100vh', backgroundColor: 'var(--bg-color)' }}>
-            {/* Header */}
-            <div style={{ backgroundColor: 'var(--card-bg)', boxShadow: 'var(--shadow)', padding: '16px 0' }}>
-                <div className="container flex-between">
-                    <h1 style={{ color: 'var(--primary-color)', fontSize: '24px' }}>Buyer Dashboard</h1>
-                    <div className="flex">
-                        <div style={{ padding: '8px 16px', backgroundColor: 'var(--bg-color)', borderRadius: '6px' }}>
-                            <strong>{user.coins}</strong> coins
-                        </div>
-                        <button onClick={logout} className="btn btn-outline">Logout</button>
-                    </div>
+        <DashboardLayout>
+            <div style={{ marginBottom: '40px' }}>
+                <h1 style={{ fontSize: '32px', fontWeight: '800', marginBottom: '8px' }}>
+                    Welcome back, <span style={{ color: 'var(--primary-color)' }}>{user?.name}</span>
+                </h1>
+                <p style={{ color: 'var(--text-secondary)' }}>You are currently managing your tasks and submissions.</p>
+            </div>
+
+            {/* Stats Cards */}
+            <div className="grid grid-3" style={{ gap: '24px', marginBottom: '48px' }}>
+                <div className="card" style={{ textAlign: 'center', padding: '32px' }}>
+                    <div style={{ fontSize: '40px', marginBottom: '16px' }}>📋</div>
+                    <h3 style={{ fontSize: '14px', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Total Tasks</h3>
+                    <p style={{ fontSize: '36px', fontWeight: '800', color: 'var(--primary-color)' }}>{stats.totalTasks}</p>
+                </div>
+                <div className="card" style={{ textAlign: 'center', padding: '32px' }}>
+                    <div style={{ fontSize: '40px', marginBottom: '16px' }}>⏳</div>
+                    <h3 style={{ fontSize: '14px', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Pending Workers</h3>
+                    <p style={{ fontSize: '36px', fontWeight: '800', color: '#f59e0b' }}>{stats.pendingWorkers}</p>
+                </div>
+                <div className="card" style={{ textAlign: 'center', padding: '32px' }}>
+                    <div style={{ fontSize: '40px', marginBottom: '16px' }}>💸</div>
+                    <h3 style={{ fontSize: '14px', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Total Payments</h3>
+                    <p style={{ fontSize: '36px', fontWeight: '800', color: '#34d399' }}>💰 {stats.totalPayments}</p>
                 </div>
             </div>
 
-            <div className="container" style={{ marginTop: '24px' }}>
-                {/* Stats Cards */}
-                <div className="grid grid-3 mb-3">
-                    <div className="card">
-                        <h3 style={{ fontSize: '14px', color: 'var(--text-secondary)', marginBottom: '8px' }}>Total Spent</h3>
-                        <p style={{ fontSize: '28px', fontWeight: 'bold', color: 'var(--danger-color)' }}>
-                            {user.totalSpent} coins
-                        </p>
-                    </div>
-                    <div className="card">
-                        <h3 style={{ fontSize: '14px', color: 'var(--text-secondary)', marginBottom: '8px' }}>Created Tasks</h3>
-                        <p style={{ fontSize: '28px', fontWeight: 'bold', color: 'var(--primary-color)' }}>
-                            {user.createdTasks}
-                        </p>
-                    </div>
-                    <div className="card">
-                        <h3 style={{ fontSize: '14px', color: 'var(--text-secondary)', marginBottom: '8px' }}>Available Coins</h3>
-                        <p style={{ fontSize: '28px', fontWeight: 'bold' }}>{user.coins} coins</p>
-                        <button onClick={handlePurchaseCoins} className="btn btn-primary mt-2" style={{ fontSize: '12px' }}>
-                            Purchase Coins
-                        </button>
-                    </div>
-                </div>
-
-                {/* Tabs */}
-                <div className="card">
-                    <div style={{ borderBottom: '1px solid var(--border-color)', marginBottom: '20px' }}>
-                        <button
-                            onClick={() => setActiveTab('tasks')}
-                            style={{
-                                padding: '12px 24px',
-                                border: 'none',
-                                background: 'none',
-                                borderBottom: activeTab === 'tasks' ? '2px solid var(--primary-color)' : 'none',
-                                color: activeTab === 'tasks' ? 'var(--primary-color)' : 'var(--text-secondary)',
-                                fontWeight: activeTab === 'tasks' ? '600' : '400',
-                                cursor: 'pointer'
-                            }}
-                        >
-                            My Tasks
-                        </button>
-                        <button
-                            onClick={() => setActiveTab('submissions')}
-                            style={{
-                                padding: '12px 24px',
-                                border: 'none',
-                                background: 'none',
-                                borderBottom: activeTab === 'submissions' ? '2px solid var(--primary-color)' : 'none',
-                                color: activeTab === 'submissions' ? 'var(--primary-color)' : 'var(--text-secondary)',
-                                fontWeight: activeTab === 'submissions' ? '600' : '400',
-                                cursor: 'pointer'
-                            }}
-                        >
-                            Pending Reviews
-                        </button>
-                    </div>
-
-                    {activeTab === 'tasks' && (
-                        <div>
-                            <div className="flex-between mb-3">
-                                <h2>My Tasks</h2>
-                                <button onClick={() => setShowCreateForm(!showCreateForm)} className="btn btn-primary">
-                                    {showCreateForm ? 'Cancel' : 'Create New Task'}
-                                </button>
-                            </div>
-
-                            {showCreateForm && (
-                                <div className="card" style={{ backgroundColor: 'var(--bg-color)', marginBottom: '20px' }}>
-                                    <h3 style={{ marginBottom: '16px' }}>Create New Task</h3>
-                                    <form onSubmit={async (e) => {
-                                        e.preventDefault();
-                                        const formData = new FormData(e.target);
-                                        const taskData = {
-                                            title: formData.get('title'),
-                                            description: formData.get('description'),
-                                            rewardPerTask: Number(formData.get('rewardPerTask')),
-                                            totalSlots: Number(formData.get('totalSlots')),
-                                            deadline: formData.get('deadline'),
-                                            category: formData.get('category') || 'other', // Default category
-                                            requirements: formData.get('requirements')
-                                        };
-
-                                        try {
-                                            await taskService.createTask(taskData);
-                                            alert('Task created successfully!');
-                                            setShowCreateForm(false);
-                                            fetchData();
-                                        } catch (error) {
-                                            alert(error.response?.data?.error || 'Failed to create task');
-                                        }
-                                    }}>
-                                        <div className="grid grid-2">
-                                            <div className="input-group">
-                                                <label>Task Title</label>
-                                                <input name="title" required placeholder="e.g. Watch Video & Like" />
-                                            </div>
-                                            <div className="input-group">
-                                                <label>Deadline</label>
-                                                <input name="deadline" type="date" required />
-                                            </div>
-                                        </div>
-                                        <div className="grid grid-2">
-                                            <div className="input-group">
-                                                <label>Reward per Task (Coins)</label>
-                                                <input name="rewardPerTask" type="number" min="1" required />
-                                            </div>
-                                            <div className="input-group">
-                                                <label>Total Slots</label>
-                                                <input name="totalSlots" type="number" min="1" required />
-                                            </div>
-                                        </div>
-                                        <div className="input-group">
-                                            <label>Description</label>
-                                            <textarea name="description" required rows="3" placeholder="Describe the task..."></textarea>
-                                        </div>
-                                        <div className="input-group">
-                                            <label>Submission Requirements</label>
-                                            <textarea name="requirements" required rows="2" placeholder="What should the worker submit? (e.g. Screenshot, Text)"></textarea>
-                                        </div>
-                                        <button type="submit" className="btn btn-primary">Create Task</button>
-                                    </form>
-                                </div>
-                            )}
-
-                            {tasks.length === 0 ? (
-                                <p style={{ color: 'var(--text-secondary)' }}>You haven't created any tasks yet.</p>
+            {/* Task To Review Table */}
+            <div style={{ marginBottom: '24px' }}>
+                <h2 style={{ fontSize: '24px', fontWeight: '700', marginBottom: '16px' }}>Tasks To Review</h2>
+                <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+                        <thead style={{ background: 'rgba(255,255,255,0.02)', borderBottom: '1px solid var(--border-color)' }}>
+                            <tr>
+                                <th style={{ padding: '20px' }}>Worker Name</th>
+                                <th style={{ padding: '20px' }}>Task Title</th>
+                                <th style={{ padding: '20px' }}>Payable</th>
+                                <th style={{ padding: '20px', textAlign: 'right' }}>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {pendingSubmissions.length === 0 ? (
+                                <tr>
+                                    <td colSpan="4" style={{ padding: '60px', textAlign: 'center', color: 'var(--text-secondary)' }}>
+                                        No pending submissions to review. Good job!
+                                    </td>
+                                </tr>
                             ) : (
-                                <div className="grid grid-2">
-                                    {tasks.map((task) => (
-                                        <div key={task._id} className="card" style={{ border: '1px solid var(--border-color)' }}>
-                                            <div className="flex-between mb-2">
-                                                <h3>{task.title}</h3>
-                                                <span className={`badge badge-${task.status === 'active' ? 'success' :
-                                                    task.status === 'completed' ? 'info' : 'warning'
-                                                    }`}>
-                                                    {task.status}
-                                                </span>
-                                            </div>
-                                            <p style={{ color: 'var(--text-secondary)', fontSize: '14px', marginBottom: '12px' }}>
-                                                {task.description}
-                                            </p>
-                                            <div style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>
-                                                <div>Reward: <strong>{task.rewardPerTask} coins</strong></div>
-                                                <div>Slots: {task.availableSlots}/{task.totalSlots}</div>
-                                                <div>Submissions: {task.submissionCount} ({task.approvedCount} approved)</div>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-                    )}
-
-                    {activeTab === 'submissions' && (
-                        <div>
-                            <h2 style={{ marginBottom: '16px' }}>Pending Reviews</h2>
-                            {submissions.filter(s => s.status === 'pending').length === 0 ? (
-                                <p style={{ color: 'var(--text-secondary)' }}>No pending submissions to review.</p>
-                            ) : (
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                                    {submissions.filter(s => s.status === 'pending').map((submission) => (
-                                        <div key={submission._id} className="card" style={{ border: '1px solid var(--border-color)' }}>
-                                            <div className="flex-between mb-2">
-                                                <div>
-                                                    <h3>{submission.task?.title}</h3>
-                                                    <p style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>
-                                                        Worker: {submission.worker?.name}
-                                                    </p>
-                                                </div>
-                                                <span className="badge badge-warning">{submission.status}</span>
-                                            </div>
-                                            <p style={{ marginBottom: '12px', fontSize: '14px' }}>
-                                                {submission.submissionDetails}
-                                            </p>
-                                            <div className="flex" style={{ gap: '8px' }}>
+                                pendingSubmissions.map((submission) => (
+                                    <tr key={submission._id} style={{ borderBottom: '1px solid var(--border-color)' }}>
+                                        <td style={{ padding: '20px' }}>
+                                            <div style={{ fontWeight: '600' }}>{submission.worker?.name}</div>
+                                        </td>
+                                        <td style={{ padding: '20px' }}>{submission.task?.title}</td>
+                                        <td style={{ padding: '20px' }}>
+                                            <span style={{ color: '#34d399', fontWeight: '600' }}>💰 {submission.task?.payable_amount}</span>
+                                        </td>
+                                        <td style={{ padding: '20px', textAlign: 'right' }}>
+                                            <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
                                                 <button
-                                                    onClick={() => handleReview(submission._id, 'approved')}
                                                     className="btn btn-secondary"
-                                                    style={{ fontSize: '14px' }}
+                                                    style={{ padding: '8px 16px', fontSize: '13px' }}
+                                                    onClick={() => setSelectedSubmission(submission)}
                                                 >
-                                                    Approve
+                                                    👁️ View Submission
                                                 </button>
                                                 <button
-                                                    onClick={() => handleReview(submission._id, 'rejected')}
-                                                    className="btn btn-danger"
-                                                    style={{ fontSize: '14px' }}
+                                                    className="btn btn-primary"
+                                                    style={{ padding: '8px 16px', fontSize: '13px', background: '#10b981', borderColor: '#10b981' }}
+                                                    onClick={() => handleApprove(submission._id)}
                                                 >
-                                                    Reject
+                                                    ✅ Approve
+                                                </button>
+                                                <button
+                                                    className="btn btn-danger"
+                                                    style={{ padding: '8px 16px', fontSize: '13px' }}
+                                                    onClick={() => handleReject(submissionId)}
+                                                >
+                                                    ❌ Reject
                                                 </button>
                                             </div>
-                                        </div>
-                                    ))}
-                                </div>
+                                        </td>
+                                    </tr>
+                                ))
                             )}
-                        </div>
-                    )}
+                        </tbody>
+                    </table>
                 </div>
             </div>
-        </div>
+
+            {/* Submission Detail Modal */}
+            {selectedSubmission && (
+                <div style={{
+                    position: 'fixed',
+                    inset: 0,
+                    background: 'rgba(0,0,0,0.7)',
+                    backdropFilter: 'blur(5px)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    zIndex: 1000,
+                    padding: '20px'
+                }}>
+                    <motion.div
+                        initial={{ scale: 0.9, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        className="card"
+                        style={{ maxWidth: '600px', width: '100%', position: 'relative' }}
+                    >
+                        <button
+                            onClick={() => setSelectedSubmission(null)}
+                            style={{ position: 'absolute', top: '20px', right: '20px', background: 'none', border: 'none', fontSize: '24px', color: 'var(--text-secondary)', cursor: 'pointer' }}
+                        >
+                            ×
+                        </button>
+                        <h2 style={{ marginBottom: '24px' }}>Submission Proof</h2>
+
+                        <div style={{ marginBottom: '24px' }}>
+                            <label style={{ fontSize: '12px', color: 'var(--text-secondary)', textTransform: 'uppercase', marginBottom: '8px', display: 'block' }}>Worker Message</label>
+                            <p style={{ background: 'var(--bg-primary)', padding: '16px', borderRadius: '12px', border: '1px solid var(--border-color)' }}>
+                                {selectedSubmission.submission_details}
+                            </p>
+                        </div>
+
+                        <div style={{ display: 'flex', gap: '16px' }}>
+                            <button
+                                onClick={() => { handleApprove(selectedSubmission._id); setSelectedSubmission(null); }}
+                                className="btn btn-primary"
+                                style={{ flex: 1, background: '#10b981', borderColor: '#10b981' }}
+                            >
+                                ✅ Approve
+                            </button>
+                            <button
+                                onClick={() => { handleReject(selectedSubmission._id); setSelectedSubmission(null); }}
+                                className="btn btn-danger"
+                                style={{ flex: 1 }}
+                            >
+                                ❌ Reject
+                            </button>
+                        </div>
+                    </motion.div>
+                </div>
+            )}
+        </DashboardLayout>
     );
 };
 

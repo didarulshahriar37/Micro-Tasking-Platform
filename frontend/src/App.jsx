@@ -1,12 +1,20 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { ThemeProvider } from './context/ThemeContext';
+
+// Pages
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Home from './pages/Home';
 import WorkerDashboard from './pages/WorkerDashboard';
 import BuyerDashboard from './pages/BuyerDashboard';
 import AdminDashboard from './pages/AdminDashboard';
+import AddTask from './pages/AddTask';
+import MyTasks from './pages/MyTasks';
+import PurchaseCoin from './pages/PurchaseCoin';
+import PaymentHistory from './pages/PaymentHistory';
+
 import './App.css';
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
@@ -28,18 +36,13 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
 };
 
 const AppRoutes = () => {
-  const { user } = useAuth();
-
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/" element={<Home />} />
 
-      <Route
-        path="/"
-        element={<Home />}
-      />
-
+      {/* Worker Routes */}
       <Route
         path="/worker/*"
         element={
@@ -49,15 +52,23 @@ const AppRoutes = () => {
         }
       />
 
+      {/* Buyer Routes */}
       <Route
         path="/buyer/*"
         element={
           <ProtectedRoute allowedRoles={['buyer']}>
-            <BuyerDashboard />
+            <Routes>
+              <Route index element={<BuyerDashboard />} />
+              <Route path="add-task" element={<AddTask />} />
+              <Route path="my-tasks" element={<MyTasks />} />
+              <Route path="purchase-coin" element={<PurchaseCoin />} />
+              <Route path="payment-history" element={<PaymentHistory />} />
+            </Routes>
           </ProtectedRoute>
         }
       />
 
+      {/* Admin Routes */}
       <Route
         path="/admin/*"
         element={
@@ -72,11 +83,13 @@ const AppRoutes = () => {
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
-        <AppRoutes />
-      </Router>
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <Router>
+          <AppRoutes />
+        </Router>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
 
