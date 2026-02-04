@@ -52,6 +52,7 @@ const TaskDetails = () => {
 
     return (
         <DashboardLayout>
+            <title>Task Details</title>
             <div style={{ marginBottom: '40px' }}>
                 <h1 style={{ fontSize: 'clamp(24px, 5vw, 32px)', fontWeight: '800', marginBottom: '8px' }}>Task Details</h1>
                 <p style={{ color: 'var(--text-secondary)' }}>Read the instructions carefully before submitting.</p>

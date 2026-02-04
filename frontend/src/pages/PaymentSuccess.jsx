@@ -43,6 +43,7 @@ const PaymentSuccess = () => {
 
     return (
         <DashboardLayout>
+            <title>Payment Success | Buyer</title>
             <div style={{
                 display: 'flex',
                 flexDirection: 'column',

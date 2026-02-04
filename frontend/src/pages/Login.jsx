@@ -56,6 +56,7 @@ const Login = () => {
 
     return (
         <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
+            <title>Login | MicroTask</title>
             <Link to="/" style={{
                 display: 'flex',
                 alignItems: 'center',

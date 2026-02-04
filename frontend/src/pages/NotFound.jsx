@@ -15,6 +15,7 @@ const NotFound = () => {
             textAlign: 'center',
             background: 'var(--bg-primary)'
         }}>
+            <title>404 | Not Found</title>
             <motion.div
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}

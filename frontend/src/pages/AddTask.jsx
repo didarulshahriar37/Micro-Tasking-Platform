@@ -86,6 +86,7 @@ const AddTask = () => {
 
     return (
         <DashboardLayout>
+            <title>Add Task | Buyer</title>
             <div style={{ maxWidth: '800px', margin: '0 auto' }}>
                 <div style={{ marginBottom: '32px' }}>
                     <h1 style={{ fontSize: 'clamp(24px, 5vw, 32px)', fontWeight: '800', marginBottom: '8px' }}>Create New Task</h1>

@@ -49,6 +49,7 @@ const MyTasks = () => {
 
     return (
         <DashboardLayout>
+            <title>My Tasks | Buyer</title>
             <div style={{ marginBottom: '32px' }}>
                 <h1 style={{ fontSize: 'clamp(24px, 5vw, 32px)', fontWeight: '800', marginBottom: '8px' }}>My Tasks</h1>
                 <p style={{ color: 'var(--text-secondary)' }}>Manage and track your active task postings.</p>

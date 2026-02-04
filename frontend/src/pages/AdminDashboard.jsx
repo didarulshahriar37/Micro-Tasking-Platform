@@ -58,6 +58,7 @@ const AdminDashboard = () => {
 
     return (
         <DashboardLayout>
+            <title>Admin Dashboard | MicroTask</title>
             <div style={{ marginBottom: '40px' }}>
                 <h1 style={{ fontSize: '32px', fontWeight: '800', marginBottom: '8px' }}>
                     Admin <span style={{ color: 'var(--primary-color)' }}>Overview</span>

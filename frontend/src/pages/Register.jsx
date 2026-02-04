@@ -120,6 +120,7 @@ const Register = () => {
 
     return (
         <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px 20px' }}>
+            <title>Register | MicroTask</title>
             <Link to="/" style={{
                 display: 'flex',
                 alignItems: 'center',

@@ -42,6 +42,7 @@ const PurchaseCoin = () => {
 
     return (
         <DashboardLayout>
+            <title>Purchase Coins | Buyer</title>
             <div style={{ marginBottom: '40px', textAlign: 'center' }}>
                 <h1 style={{ fontSize: 'clamp(28px, 6vw, 36px)', fontWeight: '800', marginBottom: '12px' }}>
                     Purchase <span style={{ color: 'var(--primary-color)' }}>Coins</span>

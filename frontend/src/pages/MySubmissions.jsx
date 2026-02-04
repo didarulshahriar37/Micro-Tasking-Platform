@@ -37,6 +37,7 @@ const MySubmissions = () => {
 
     return (
         <DashboardLayout>
+            <title>My Submissions | Worker</title>
             <div style={{ marginBottom: '40px' }}>
                 <h1 style={{ fontSize: 'clamp(24px, 5vw, 32px)', fontWeight: '800', marginBottom: '8px' }}>My Submissions</h1>
                 <p style={{ color: 'var(--text-secondary)' }}>Track the status of your submitted tasks.</p>

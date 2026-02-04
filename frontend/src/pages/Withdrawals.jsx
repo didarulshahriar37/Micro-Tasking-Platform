@@ -57,6 +57,7 @@ const Withdrawals = () => {
 
     return (
         <DashboardLayout>
+            <title>Withdraw Funds</title>
             <div style={{ marginBottom: '40px' }}>
                 <h1 style={{ fontSize: 'clamp(24px, 5vw, 32px)', fontWeight: '800', marginBottom: '8px' }}>Withdraw Funds</h1>
                 <p style={{ color: 'var(--text-secondary)' }}>Convert your hard-earned coins into real money.</p>

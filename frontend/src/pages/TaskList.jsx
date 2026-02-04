@@ -28,6 +28,7 @@ const TaskList = () => {
 
     return (
         <DashboardLayout>
+            <title>Available Tasks</title>
             <div style={{ marginBottom: '40px' }}>
                 <h1 style={{ fontSize: 'clamp(24px, 5vw, 32px)', fontWeight: '800', marginBottom: '8px' }}>Available Tasks</h1>
                 <p style={{ color: 'var(--text-secondary)' }}>Choose a task and start earning coins.</p>

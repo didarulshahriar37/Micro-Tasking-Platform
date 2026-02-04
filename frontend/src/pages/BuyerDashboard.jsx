@@ -75,6 +75,7 @@ const BuyerDashboard = () => {
 
     return (
         <DashboardLayout>
+            <title>Buyer Dashboard | MicroTask</title>
             <div style={{ marginBottom: '40px' }}>
                 <h1 style={{ fontSize: '32px', fontWeight: '800', marginBottom: '8px' }}>
                     Welcome back, <span style={{ color: 'var(--primary-color)' }}>{user?.name}</span>

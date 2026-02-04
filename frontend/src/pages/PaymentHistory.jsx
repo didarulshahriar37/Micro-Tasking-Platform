@@ -26,6 +26,7 @@ const PaymentHistory = () => {
 
     return (
         <DashboardLayout>
+            <title>Payment History | Buyer</title>
             <div style={{ marginBottom: '32px' }}>
                 <h1 style={{ fontSize: 'clamp(24px, 5vw, 32px)', fontWeight: '800', marginBottom: '8px' }}>Payment History</h1>
                 <p style={{ color: 'var(--text-secondary)' }}>View all your coin purchases and transaction logs.</p>
