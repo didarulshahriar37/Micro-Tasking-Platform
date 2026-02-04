@@ -1,5 +1,7 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { authService } from '../services/api';
+import { signInWithPopup } from 'firebase/auth';
+import { auth, googleProvider } from '../firebase/firebase.config';
 
 const AuthContext = createContext(null);
 
@@ -26,24 +28,48 @@ export const AuthProvider = ({ children }) => {
 
     const login = async (email, password) => {
         const response = await authService.login({ email, password });
-        const { user, token } = response.data;
+        const { user: userData, token } = response.data;
 
         localStorage.setItem('token', token);
-        localStorage.setItem('user', JSON.stringify(user));
-        setUser(user);
+        localStorage.setItem('user', JSON.stringify(userData));
+        setUser(userData);
 
-        return user;
+        return userData;
     };
 
-    const register = async (name, email, password, role) => {
-        const response = await authService.register({ name, email, password, role });
-        const { user, token } = response.data;
+    const register = async (name, email, password, role, profileImage) => {
+        const response = await authService.register({ name, email, password, role, profileImage });
+        const { user: userData, token } = response.data;
 
         localStorage.setItem('token', token);
-        localStorage.setItem('user', JSON.stringify(user));
-        setUser(user);
+        localStorage.setItem('user', JSON.stringify(userData));
+        setUser(userData);
 
-        return user;
+        return userData;
+    };
+
+    const googleLogin = async () => {
+        try {
+            const result = await signInWithPopup(auth, googleProvider);
+            const user = result.user;
+
+            const response = await authService.googleLogin({
+                name: user.displayName,
+                email: user.email,
+                profileImage: user.photoURL
+            });
+
+            const { user: userData, token } = response.data;
+
+            localStorage.setItem('token', token);
+            localStorage.setItem('user', JSON.stringify(userData));
+            setUser(userData);
+
+            return userData;
+        } catch (error) {
+            console.error('Google Sign-In Error:', error);
+            throw error;
+        }
     };
 
     const logout = () => {
@@ -57,7 +83,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ user, login, register, logout, updateUser, loading }}>
+        <AuthContext.Provider value={{ user, login, register, logout, googleLogin, updateUser, loading }}>
             {children}
         </AuthContext.Provider>
     );

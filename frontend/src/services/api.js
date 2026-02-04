@@ -26,6 +26,7 @@ api.interceptors.request.use(
 export const authService = {
     register: (data) => api.post('/auth/register', data),
     login: (data) => api.post('/auth/login', data),
+    googleLogin: (data) => api.post('/auth/google-login', data),
     getProfile: () => api.get('/auth/me'),
     logout: () => {
         localStorage.removeItem('token');

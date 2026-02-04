@@ -7,8 +7,28 @@ const Login = () => {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
-    const { login } = useAuth();
+    const { login, googleLogin } = useAuth();
     const navigate = useNavigate();
+
+    const handleGoogleLogin = async () => {
+        setError('');
+        setLoading(true);
+        try {
+            const user = await googleLogin();
+            // Redirect based on role (Default for Google is worker)
+            if (user.role === 'worker') {
+                navigate('/worker');
+            } else if (user.role === 'buyer') {
+                navigate('/buyer');
+            } else {
+                navigate('/');
+            }
+        } catch (err) {
+            setError('Google sign-in failed. Please try again.');
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -27,7 +47,7 @@ const Login = () => {
                 navigate('/admin');
             }
         } catch (err) {
-            setError(err.response?.data?.error || 'Login failed. Please try again.');
+            setError(err.response?.data?.error || 'Invalid email or password.');
         } finally {
             setLoading(false);
         }
@@ -36,22 +56,36 @@ const Login = () => {
     return (
         <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
             <div className="card" style={{ maxWidth: '400px', width: '100%' }}>
-                <h1 style={{ marginBottom: '24px', textAlign: 'center', color: 'var(--primary-color)' }}>
-                    Micro Tasking Platform
+                <h1 style={{ marginBottom: '12px', textAlign: 'center', fontSize: '28px' }}>
+                    Welcome <span style={{ color: 'var(--primary-color)' }}>Back</span>
                 </h1>
-                <h2 style={{ marginBottom: '24px', fontSize: '20px' }}>Login</h2>
+                <p style={{ textAlign: 'center', color: 'var(--text-secondary)', marginBottom: '32px' }}>
+                    Login to access your dashboard.
+                </p>
 
-                {error && <div className="error">{error}</div>}
+                {error && (
+                    <div style={{
+                        background: 'rgba(239, 68, 68, 0.1)',
+                        border: '1px solid var(--danger)',
+                        color: 'var(--danger)',
+                        padding: '12px',
+                        borderRadius: '8px',
+                        marginBottom: '20px',
+                        fontSize: '14px'
+                    }}>
+                        {error}
+                    </div>
+                )}
 
                 <form onSubmit={handleSubmit}>
                     <div className="input-group">
-                        <label>Email</label>
+                        <label>Email Address</label>
                         <input
                             type="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             required
-                            placeholder="Enter your email"
+                            placeholder="john@example.com"
                         />
                     </div>
 
@@ -62,23 +96,48 @@ const Login = () => {
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             required
-                            placeholder="Enter your password"
+                            placeholder="••••••••"
                         />
                     </div>
 
                     <button
                         type="submit"
                         className="btn btn-primary"
-                        style={{ width: '100%', marginTop: '8px' }}
+                        style={{ width: '100%', marginTop: '12px', height: '48px', justifyContent: 'center' }}
                         disabled={loading}
                     >
                         {loading ? 'Logging in...' : 'Login'}
                     </button>
+
+                    <div style={{ textAlign: 'center', margin: '20px 0', position: 'relative' }}>
+                        <hr style={{ border: '0', borderTop: '1px solid var(--border-color)' }} />
+                        <span style={{
+                            position: 'absolute',
+                            top: '50%',
+                            left: '50%',
+                            transform: 'translate(-50%, -50%)',
+                            background: 'var(--bg-card)',
+                            padding: '0 10px',
+                            color: 'var(--text-secondary)',
+                            fontSize: '13px'
+                        }}>OR</span>
+                    </div>
+
+                    <button
+                        type="button"
+                        onClick={handleGoogleLogin}
+                        className="btn btn-secondary"
+                        style={{ width: '100%', height: '48px', justifyContent: 'center', background: 'white', color: '#1e293b' }}
+                        disabled={loading}
+                    >
+                        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" style={{ width: '18px', marginRight: '8px' }} />
+                        Continue with Google
+                    </button>
                 </form>
 
-                <p style={{ marginTop: '16px', textAlign: 'center', color: 'var(--text-secondary)' }}>
+                <p style={{ marginTop: '24px', textAlign: 'center', color: 'var(--text-secondary)', fontSize: '14px' }}>
                     Don't have an account?{' '}
-                    <Link to="/register" style={{ color: 'var(--primary-color)', textDecoration: 'none' }}>
+                    <Link to="/register" style={{ color: 'var(--primary-color)', textDecoration: 'none', fontWeight: '600' }}>
                         Register here
                     </Link>
                 </p>

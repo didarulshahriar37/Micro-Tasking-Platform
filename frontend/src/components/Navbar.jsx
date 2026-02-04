@@ -17,6 +17,11 @@ const Navbar = () => {
 
     const toggleMenu = () => setIsOpen(!isOpen);
 
+    const handleLogout = () => {
+        logout();
+        navigate('/login');
+    };
+
     const dashboardLink = user?.role === 'worker' ? '/worker' :
         user?.role === 'buyer' ? '/buyer' :
             user?.role === 'admin' ? '/admin' : '/';
