@@ -6,6 +6,20 @@ const Submission = require('../models/Submission');
 const Notification = require('../models/Notification');
 const { auth, authorize } = require('../middleware/auth');
 
+// Get top 6 workers (Public)
+router.get('/best', async (req, res) => {
+    try {
+        const workers = await User.find({ role: 'worker' })
+            .sort({ coins: -1 })
+            .limit(6)
+            .select('name profileImage coins availableCoins'); // Select necessary fields
+
+        res.json({ workers });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 // Get all users (Admin only)
 router.get('/', auth, authorize('admin'), async (req, res) => {
     try {

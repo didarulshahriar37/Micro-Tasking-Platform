@@ -139,9 +139,58 @@ const BuyerDashboard = () => {
                             {showCreateForm && (
                                 <div className="card" style={{ backgroundColor: 'var(--bg-color)', marginBottom: '20px' }}>
                                     <h3 style={{ marginBottom: '16px' }}>Create New Task</h3>
-                                    <p style={{ color: 'var(--text-secondary)', fontSize: '14px' }}>
-                                        Task creation form will be implemented here. You can create tasks with title, description, reward, slots, and deadline.
-                                    </p>
+                                    <form onSubmit={async (e) => {
+                                        e.preventDefault();
+                                        const formData = new FormData(e.target);
+                                        const taskData = {
+                                            title: formData.get('title'),
+                                            description: formData.get('description'),
+                                            rewardPerTask: Number(formData.get('rewardPerTask')),
+                                            totalSlots: Number(formData.get('totalSlots')),
+                                            deadline: formData.get('deadline'),
+                                            category: formData.get('category') || 'other', // Default category
+                                            requirements: formData.get('requirements')
+                                        };
+
+                                        try {
+                                            await taskService.createTask(taskData);
+                                            alert('Task created successfully!');
+                                            setShowCreateForm(false);
+                                            fetchData();
+                                        } catch (error) {
+                                            alert(error.response?.data?.error || 'Failed to create task');
+                                        }
+                                    }}>
+                                        <div className="grid grid-2">
+                                            <div className="input-group">
+                                                <label>Task Title</label>
+                                                <input name="title" required placeholder="e.g. Watch Video & Like" />
+                                            </div>
+                                            <div className="input-group">
+                                                <label>Deadline</label>
+                                                <input name="deadline" type="date" required />
+                                            </div>
+                                        </div>
+                                        <div className="grid grid-2">
+                                            <div className="input-group">
+                                                <label>Reward per Task (Coins)</label>
+                                                <input name="rewardPerTask" type="number" min="1" required />
+                                            </div>
+                                            <div className="input-group">
+                                                <label>Total Slots</label>
+                                                <input name="totalSlots" type="number" min="1" required />
+                                            </div>
+                                        </div>
+                                        <div className="input-group">
+                                            <label>Description</label>
+                                            <textarea name="description" required rows="3" placeholder="Describe the task..."></textarea>
+                                        </div>
+                                        <div className="input-group">
+                                            <label>Submission Requirements</label>
+                                            <textarea name="requirements" required rows="2" placeholder="What should the worker submit? (e.g. Screenshot, Text)"></textarea>
+                                        </div>
+                                        <button type="submit" className="btn btn-primary">Create Task</button>
+                                    </form>
                                 </div>
                             )}
 
@@ -154,7 +203,7 @@ const BuyerDashboard = () => {
                                             <div className="flex-between mb-2">
                                                 <h3>{task.title}</h3>
                                                 <span className={`badge badge-${task.status === 'active' ? 'success' :
-                                                        task.status === 'completed' ? 'info' : 'warning'
+                                                    task.status === 'completed' ? 'info' : 'warning'
                                                     }`}>
                                                     {task.status}
                                                 </span>

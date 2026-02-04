@@ -28,16 +28,32 @@ const WorkerDashboard = () => {
         }
     };
 
-    const handleWithdraw = async () => {
-        const amount = prompt('Enter amount to withdraw (minimum 10 coins):');
-        if (amount && parseFloat(amount) >= 10) {
-            try {
-                await transactionService.withdrawCoins(parseFloat(amount));
-                alert('Withdrawal successful!');
-                window.location.reload();
-            } catch (error) {
-                alert(error.response?.data?.error || 'Withdrawal failed');
-            }
+    const [selectedTask, setSelectedTask] = useState(null);
+
+    // ... existing load logic ...
+
+    const handleViewTask = (task) => {
+        setSelectedTask(task);
+    };
+
+    const handleCloseModal = () => {
+        setSelectedTask(null);
+    };
+
+    const handleSubmitTask = async (e) => {
+        e.preventDefault();
+        const submissionDetails = e.target.submissionDetails.value;
+
+        try {
+            await submissionService.submitTask({
+                taskId: selectedTask._id,
+                submissionDetails
+            });
+            alert('Task submitted successfully!');
+            handleCloseModal();
+            fetchData();
+        } catch (error) {
+            alert(error.response?.data?.error || 'Submission failed');
         }
     };
 
@@ -45,7 +61,7 @@ const WorkerDashboard = () => {
 
     return (
         <div style={{ minHeight: '100vh', backgroundColor: 'var(--bg-color)' }}>
-            {/* Header */}
+            {/* ... Header ... */}
             <div style={{ backgroundColor: 'var(--card-bg)', boxShadow: 'var(--shadow)', padding: '16px 0' }}>
                 <div className="container flex-between">
                     <h1 style={{ color: 'var(--primary-color)', fontSize: '24px' }}>Worker Dashboard</h1>
@@ -59,7 +75,7 @@ const WorkerDashboard = () => {
             </div>
 
             <div className="container" style={{ marginTop: '24px' }}>
-                {/* Stats Cards */}
+                {/* ... Stats Cards ... */}
                 <div className="grid grid-3 mb-3">
                     <div className="card">
                         <h3 style={{ fontSize: '14px', color: 'var(--text-secondary)', marginBottom: '8px' }}>Total Earnings</h3>
@@ -126,7 +142,7 @@ const WorkerDashboard = () => {
                                         <div key={task._id} className="card" style={{ border: '1px solid var(--border-color)' }}>
                                             <h3 style={{ marginBottom: '8px' }}>{task.title}</h3>
                                             <p style={{ color: 'var(--text-secondary)', fontSize: '14px', marginBottom: '12px' }}>
-                                                {task.description}
+                                                {task.description.substring(0, 100)}...
                                             </p>
                                             <div className="flex-between" style={{ marginBottom: '12px' }}>
                                                 <span className="badge badge-success">{task.rewardPerTask} coins</span>
@@ -134,7 +150,11 @@ const WorkerDashboard = () => {
                                                     {task.availableSlots} slots left
                                                 </span>
                                             </div>
-                                            <button className="btn btn-primary" style={{ width: '100%', fontSize: '14px' }}>
+                                            <button
+                                                onClick={() => handleViewTask(task)}
+                                                className="btn btn-primary"
+                                                style={{ width: '100%', fontSize: '14px' }}
+                                            >
                                                 View & Submit
                                             </button>
                                         </div>
@@ -161,7 +181,7 @@ const WorkerDashboard = () => {
                                                     </p>
                                                 </div>
                                                 <span className={`badge badge-${submission.status === 'approved' ? 'success' :
-                                                        submission.status === 'rejected' ? 'danger' : 'warning'
+                                                    submission.status === 'rejected' ? 'danger' : 'warning'
                                                     }`}>
                                                     {submission.status}
                                                 </span>
@@ -179,6 +199,66 @@ const WorkerDashboard = () => {
                     )}
                 </div>
             </div>
+
+            {/* Task Detail Modal */}
+            {selectedTask && (
+                <div style={{
+                    position: 'fixed',
+                    top: 0, left: 0, right: 0, bottom: 0,
+                    backgroundColor: 'rgba(0,0,0,0.5)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    zIndex: 2000,
+                    padding: '20px'
+                }}>
+                    <div className="card" style={{ maxWidth: '600px', width: '100%', maxHeight: '90vh', overflowY: 'auto' }}>
+                        <div className="flex-between mb-3">
+                            <h2 style={{ fontSize: '20px' }}>{selectedTask.title}</h2>
+                            <button onClick={handleCloseModal} style={{ background: 'none', border: 'none', fontSize: '24px', cursor: 'pointer' }}>×</button>
+                        </div>
+
+                        <div className="mb-3">
+                            <h4 style={{ marginBottom: '8px' }}>Description</h4>
+                            <p style={{ color: 'var(--text-secondary)', lineHeight: '1.6' }}>{selectedTask.description}</p>
+                        </div>
+
+                        <div className="grid grid-2 mb-3">
+                            <div>
+                                <h4 style={{ marginBottom: '8px' }}>Reward</h4>
+                                <span className="badge badge-success" style={{ fontSize: '14px' }}>{selectedTask.rewardPerTask} coins</span>
+                            </div>
+                            <div>
+                                <h4 style={{ marginBottom: '8px' }}>Deadline</h4>
+                                <p style={{ fontSize: '14px' }}>{new Date(selectedTask.deadline).toLocaleDateString()}</p>
+                            </div>
+                        </div>
+
+                        <div className="mb-3">
+                            <h4 style={{ marginBottom: '8px' }}>Requirements</h4>
+                            <p style={{ backgroundColor: '#f3f4f6', padding: '12px', borderRadius: '6px', fontSize: '14px' }}>
+                                {selectedTask.requirements || 'No specific requirements mentioned.'}
+                            </p>
+                        </div>
+
+                        <form onSubmit={handleSubmitTask}>
+                            <div className="input-group">
+                                <label>Submission Details</label>
+                                <textarea
+                                    name="submissionDetails"
+                                    required
+                                    rows="4"
+                                    placeholder="Enter your submission details here..."
+                                ></textarea>
+                            </div>
+                            <div className="flex" style={{ justifyContent: 'flex-end', gap: '12px' }}>
+                                <button type="button" onClick={handleCloseModal} className="btn btn-outline">Cancel</button>
+                                <button type="submit" className="btn btn-primary">Submit Task</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

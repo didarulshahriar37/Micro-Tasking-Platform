@@ -13,10 +13,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Database connection
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/micro-tasking-platform', {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-})
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/micro-tasking-platform')
     .then(() => console.log('✅ MongoDB connected successfully'))
     .catch((err) => console.error('❌ MongoDB connection error:', err));
 

@@ -60,6 +60,7 @@ export const transactionService = {
 // User services
 export const userService = {
     getAllUsers: (params) => api.get('/users', { params }),
+    getBestWorkers: () => api.get('/users/best'),
     getStats: () => api.get('/users/stats'),
     toggleUserStatus: (id) => api.patch(`/users/${id}/toggle-status`),
     getNotifications: (params) => api.get('/users/notifications', { params }),

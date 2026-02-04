@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import Home from './pages/Home';
 import WorkerDashboard from './pages/WorkerDashboard';
 import BuyerDashboard from './pages/BuyerDashboard';
 import AdminDashboard from './pages/AdminDashboard';
@@ -31,21 +32,12 @@ const AppRoutes = () => {
 
   return (
     <Routes>
-      <Route path="/login" element={user ? <Navigate to="/" /> : <Login />} />
-      <Route path="/register" element={user ? <Navigate to="/" /> : <Register />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
 
       <Route
         path="/"
-        element={
-          user ? (
-            user.role === 'worker' ? <Navigate to="/worker" /> :
-              user.role === 'buyer' ? <Navigate to="/buyer" /> :
-                user.role === 'admin' ? <Navigate to="/admin" /> :
-                  <Navigate to="/login" />
-          ) : (
-            <Navigate to="/login" />
-          )
-        }
+        element={<Home />}
       />
 
       <Route
