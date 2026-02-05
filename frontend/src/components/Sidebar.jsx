@@ -19,8 +19,6 @@ const Sidebar = ({ isOpen, onClose }) => {
     const { user } = useAuth();
 
     const getLinks = () => {
-        const baseClass = "sidebar-link";
-
         switch (user?.role) {
             case 'worker':
                 return [
