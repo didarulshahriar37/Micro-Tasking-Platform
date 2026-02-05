@@ -11,7 +11,8 @@ import {
     LayoutDashboard,
     Menu,
     X,
-    MessageSquare
+    MessageSquare,
+    Github
 } from 'lucide-react';
 
 const Navbar = () => {
@@ -88,6 +89,7 @@ const Navbar = () => {
     const dashboardLink = user?.role === 'worker' ? '/worker' :
         user?.role === 'buyer' ? '/buyer' :
             user?.role === 'admin' ? '/admin' : '/';
+    const clientRepoUrl = 'https://github.com/didarulshahriar37/Micro-Tasking-Platform';
 
     return (
         <nav style={{
@@ -281,9 +283,16 @@ const Navbar = () => {
                                 <Link to="/login" className="btn btn-outline" style={{ border: 'none', color: 'var(--text-primary)', padding: '10px 20px', fontWeight: '600' }}>
                                     Login
                                 </Link>
-                                <Link to={user ? dashboardLink : "/register"} className="btn btn-primary" style={{ padding: '10px 24px', borderRadius: '10px', fontWeight: '700', boxShadow: '0 4px 10px rgba(99, 102, 241, 0.2)' }}>
-                                    Get Started
-                                </Link>
+                                <a
+                                    href={clientRepoUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="btn btn-primary"
+                                    style={{ padding: '10px 24px', borderRadius: '10px', fontWeight: '700', boxShadow: '0 4px 10px rgba(99, 102, 241, 0.2)', display: 'flex', alignItems: 'center', gap: '8px' }}
+                                >
+                                    <Github size={16} />
+                                    Join As Developer
+                                </a>
                             </div>
                         ) : (
                             <div className="nav-profile-group" style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
@@ -422,7 +431,16 @@ const Navbar = () => {
                     ) : (
                         <>
                             <Link to="/login" className="btn btn-outline" style={{ height: '48px', justifyContent: 'center' }}>Login</Link>
-                            <Link to="/register" className="btn btn-primary" style={{ height: '48px', justifyContent: 'center' }}>Get Started</Link>
+                            <a
+                                href={clientRepoUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="btn btn-primary"
+                                style={{ height: '48px', justifyContent: 'center', display: 'flex', alignItems: 'center', gap: '8px' }}
+                            >
+                                <Github size={16} />
+                                Join As Developer
+                            </a>
                         </>
                     )}
                 </div>

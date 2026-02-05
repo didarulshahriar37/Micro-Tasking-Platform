@@ -4,6 +4,7 @@ const User = require('../models/User');
 const Task = require('../models/Task');
 const Submission = require('../models/Submission');
 const Notification = require('../models/Notification');
+const Withdrawal = require('../models/Withdrawal');
 const { auth, authorize } = require('../middleware/auth');
 
 // Get top 6 workers (Public)
