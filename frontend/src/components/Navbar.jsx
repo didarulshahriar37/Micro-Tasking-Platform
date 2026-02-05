@@ -89,7 +89,7 @@ const Navbar = () => {
     const dashboardLink = user?.role === 'worker' ? '/worker' :
         user?.role === 'buyer' ? '/buyer' :
             user?.role === 'admin' ? '/admin' : '/';
-    const clientRepoUrl = 'https://github.com/didarulshahriar37/Micro-Tasking-Platform';
+    const clientRepoUrl = 'https://github.com/didarulshahriar37/Micro-Tasking-Platform/';
 
     return (
         <nav style={{

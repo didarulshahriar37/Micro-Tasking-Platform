@@ -103,7 +103,7 @@ const Footer = () => {
                         <h3 style={{ fontSize: '18px', marginBottom: '24px', fontWeight: '700', color: 'var(--text-primary)' }}>Connect With Us</h3>
                         <div className="flex" style={{ gap: '16px' }}>
                             <a
-                                href="https://github.com/programming-hero-web-course2/b10a12-client-side-didar55"
+                                href="https://github.com/didarulshahriar37"
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 style={{
@@ -136,7 +136,7 @@ const Footer = () => {
                                 <i className="fab fa-github"></i>
                             </a>
                             <a
-                                href="https://www.linkedin.com/in/didarul-shahriar/"
+                                href="https://www.linkedin.com/in/didarulshahriar/"
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 style={{
@@ -169,7 +169,7 @@ const Footer = () => {
                                 <i className="fab fa-linkedin-in"></i>
                             </a>
                             <a
-                                href="https://www.facebook.com/didarul.shahriar.37"
+                                href="https://www.facebook.com/didarulshahriar"
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 style={{
