@@ -23,11 +23,55 @@ const ManageTasks = () => {
         }
     };
 
-    const handleDeleteTask = async (taskId) => {
-        if (!window.confirm('Are you sure you want to delete this task? This action cannot be undone.')) return;
+    const confirmDelete = (task) => new Promise((resolve) => {
+        toast.custom((t) => (
+            <div style={{
+                background: 'var(--bg-card)',
+                border: '1px solid var(--border-color)',
+                borderRadius: '16px',
+                padding: '18px',
+                boxShadow: '0 20px 50px rgba(0,0,0,0.25)',
+                width: '320px'
+            }}>
+                <div style={{ fontWeight: '700', fontSize: '16px', marginBottom: '6px' }}>Delete this task?</div>
+                <div style={{ color: 'var(--text-secondary)', fontSize: '13px', marginBottom: '14px' }}>
+                    {task.title}
+                </div>
+                <div style={{ color: 'var(--text-secondary)', fontSize: '12px', marginBottom: '18px' }}>
+                    This action cannot be undone.
+                </div>
+                <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
+                    <button
+                        className="btn btn-secondary"
+                        style={{ padding: '8px 12px', fontSize: '13px' }}
+                        onClick={() => {
+                            toast.dismiss(t.id);
+                            resolve(false);
+                        }}
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        className="btn btn-danger"
+                        style={{ padding: '8px 12px', fontSize: '13px' }}
+                        onClick={() => {
+                            toast.dismiss(t.id);
+                            resolve(true);
+                        }}
+                    >
+                        Delete
+                    </button>
+                </div>
+            </div>
+        ), { duration: Infinity });
+    });
+
+    const handleDeleteTask = async (task) => {
+        const confirmed = await confirmDelete(task);
+        if (!confirmed) return;
 
         try {
-            await taskService.deleteTaskByAdmin(taskId);
+            await taskService.deleteTaskByAdmin(task._id);
             toast.success('Task deleted successfully');
             fetchTasks();
         } catch (error) {
@@ -93,7 +137,7 @@ const ManageTasks = () => {
                                         </td>
                                         <td style={{ padding: '20px', textAlign: 'right' }}>
                                             <button
-                                                onClick={() => handleDeleteTask(task._id)}
+                                                onClick={() => handleDeleteTask(task)}
                                                 className="btn btn-danger"
                                                 style={{ padding: '6px 12px', fontSize: '12px' }}
                                             >

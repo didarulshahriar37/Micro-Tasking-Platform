@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { taskService } from '../services/api';
 import DashboardLayout from '../components/DashboardLayout';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -7,6 +8,7 @@ import { useAuth } from '../context/AuthContext';
 
 const MyTasks = () => {
     const { user, updateUser } = useAuth();
+    const navigate = useNavigate();
     const [tasks, setTasks] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -29,20 +31,68 @@ const MyTasks = () => {
         }
     };
 
-    const handleDelete = async (taskId, requiredWorkers, payableAmount) => {
-        if (!window.confirm('Are you sure you want to delete this task? Uncompleted slots will be refunded.')) return;
+    const confirmDelete = (task) => new Promise((resolve) => {
+        toast.custom((t) => (
+            <div style={{
+                background: 'var(--bg-card)',
+                border: '1px solid var(--border-color)',
+                borderRadius: '16px',
+                padding: '18px',
+                boxShadow: '0 20px 50px rgba(0,0,0,0.25)',
+                width: '320px'
+            }}>
+                <div style={{ fontWeight: '700', fontSize: '16px', marginBottom: '6px' }}>Delete this task?</div>
+                <div style={{ color: 'var(--text-secondary)', fontSize: '13px', marginBottom: '14px' }}>
+                    {task.title}
+                </div>
+                <div style={{ color: 'var(--text-secondary)', fontSize: '12px', marginBottom: '18px' }}>
+                    Uncompleted slots will be refunded.
+                </div>
+                <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
+                    <button
+                        className="btn btn-secondary"
+                        style={{ padding: '8px 12px', fontSize: '13px' }}
+                        onClick={() => {
+                            toast.dismiss(t.id);
+                            resolve(false);
+                        }}
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        className="btn btn-danger"
+                        style={{ padding: '8px 12px', fontSize: '13px' }}
+                        onClick={() => {
+                            toast.dismiss(t.id);
+                            resolve(true);
+                        }}
+                    >
+                        Delete
+                    </button>
+                </div>
+            </div>
+        ), { duration: Infinity });
+    });
+
+    const handleDelete = async (task) => {
+        const confirmed = await confirmDelete(task);
+        if (!confirmed) return;
 
         try {
-            await taskService.deleteTask(taskId);
-            const refillAmount = requiredWorkers * payableAmount;
+            await taskService.deleteTask(task._id);
+            const refillAmount = task.required_workers * task.payable_amount;
 
             // Success alert & local state update
             toast.success(`Task deleted. ${refillAmount} coins have been refilled.`);
             updateUser({ ...user, coins: user.coins + refillAmount });
-            setTasks(tasks.filter(t => t._id !== taskId));
+            setTasks(tasks.filter(t => t._id !== task._id));
         } catch (error) {
             toast.error(error.response?.data?.error || 'Failed to delete task');
         }
+    };
+
+    const handleEdit = (taskId) => {
+        navigate(`/buyer/add-task?edit=${taskId}`);
     };
 
     if (loading) return <DashboardLayout><LoadingSpinner text="Loading your tasks..." /></DashboardLayout>;
@@ -99,14 +149,14 @@ const MyTasks = () => {
                                                 <button
                                                     className="btn btn-secondary"
                                                     style={{ padding: '8px 12px', fontSize: '13px' }}
-                                                    onClick={() => toast.success('Update feature coming soon!')}
+                                                    onClick={() => handleEdit(task._id)}
                                                 >
                                                     ✏️ Edit
                                                 </button>
                                                 <button
                                                     className="btn btn-danger"
                                                     style={{ padding: '8px 12px', fontSize: '13px' }}
-                                                    onClick={() => handleDelete(task._id, task.required_workers, task.payable_amount)}
+                                                    onClick={() => handleDelete(task)}
                                                 >
                                                     🗑️ Delete
                                                 </button>

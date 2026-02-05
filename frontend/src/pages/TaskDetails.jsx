@@ -41,7 +41,7 @@ const TaskDetails = () => {
             toast.success('Submission successful! Under review.');
             navigate('/worker/my-submissions');
         } catch (error) {
-            alert(error.response?.data?.error || 'Submission failed. Please try again.');
+            toast.error(error.response?.data?.error || 'Submission failed. Please try again.');
         } finally {
             setSubmitting(false);
         }

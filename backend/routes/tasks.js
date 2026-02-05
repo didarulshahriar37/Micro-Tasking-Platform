@@ -74,6 +74,7 @@ router.post('/', auth, authorize('buyer'), async (req, res) => {
             buyer: req.user._id,
             payable_amount,
             required_workers,
+            available_workers: required_workers,
             category,
             submission_info,
             deadline,
@@ -90,6 +91,81 @@ router.post('/', auth, authorize('buyer'), async (req, res) => {
 
         res.status(201).json({
             message: 'Task created successfully',
+            task,
+            remainingCoins: req.user.coins
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Update task (Buyer only - own tasks)
+router.patch('/:id', auth, authorize('buyer'), async (req, res) => {
+    try {
+        const task = await Task.findById(req.params.id);
+
+        if (!task) {
+            return res.status(404).json({ error: 'Task not found' });
+        }
+
+        if (task.buyer.toString() !== req.user._id.toString()) {
+            return res.status(403).json({ error: 'Not authorized' });
+        }
+
+        const {
+            title,
+            description,
+            payable_amount,
+            required_workers,
+            category,
+            submission_info,
+            deadline,
+            task_image_url
+        } = req.body;
+
+        const nextRequiredWorkers = required_workers !== undefined ? Number(required_workers) : task.required_workers;
+        const nextPayableAmount = payable_amount !== undefined ? Number(payable_amount) : task.payable_amount;
+
+        if (Number.isNaN(nextRequiredWorkers) || nextRequiredWorkers < 1) {
+            return res.status(400).json({ error: 'Required workers must be at least 1' });
+        }
+
+        if (Number.isNaN(nextPayableAmount) || nextPayableAmount < 1) {
+            return res.status(400).json({ error: 'Payable amount must be at least 1' });
+        }
+
+        if (nextRequiredWorkers < task.submissionCount) {
+            return res.status(400).json({ error: 'Required workers cannot be less than current submissions' });
+        }
+
+        const oldTotalCost = task.required_workers * task.payable_amount;
+        const newTotalCost = nextRequiredWorkers * nextPayableAmount;
+        const delta = newTotalCost - oldTotalCost;
+
+        if (delta > 0 && req.user.coins < delta) {
+            return res.status(400).json({ error: 'Not available Coin. Purchase Coin' });
+        }
+
+        task.title = title !== undefined ? title : task.title;
+        task.description = description !== undefined ? description : task.description;
+        task.payable_amount = nextPayableAmount;
+        task.required_workers = nextRequiredWorkers;
+        task.available_workers = nextRequiredWorkers - task.submissionCount;
+        task.category = category !== undefined ? category : task.category;
+        task.submission_info = submission_info !== undefined ? submission_info : task.submission_info;
+        task.deadline = deadline !== undefined ? deadline : task.deadline;
+        task.task_image_url = task_image_url !== undefined ? task_image_url : task.task_image_url;
+
+        await task.save();
+
+        if (delta !== 0) {
+            req.user.coins -= delta;
+            req.user.totalSpent = Math.max(0, req.user.totalSpent + delta);
+            await req.user.save();
+        }
+
+        res.json({
+            message: 'Task updated successfully',
             task,
             remainingCoins: req.user.coins
         });

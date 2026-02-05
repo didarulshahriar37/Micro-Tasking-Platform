@@ -34,7 +34,7 @@ router.post('/', auth, authorize('worker'), async (req, res) => {
     try {
         const { taskId, submission_details, attachments } = req.body;
 
-        const task = await Task.findById(taskId);
+        const task = await Task.findById(taskId).populate('buyer', 'name email');
         if (!task) {
             return res.status(404).json({ error: 'Task not found' });
         }
@@ -55,14 +55,15 @@ router.post('/', auth, authorize('worker'), async (req, res) => {
 
         // Create submission
         const submission = new Submission({
+            task: taskId,
             task_id: taskId,
             task_title: task.title,
             payable_amount: task.payable_amount,
             worker: req.user._id,
             worker_email: req.user.email,
             worker_name: req.user.name,
-            Buyer_name: task.buyer.name,
-            Buyer_email: task.buyer.email,
+            Buyer_name: task.buyer?.name,
+            Buyer_email: task.buyer?.email,
             submission_details,
             status: 'pending'
         });
@@ -76,8 +77,8 @@ router.post('/', auth, authorize('worker'), async (req, res) => {
 
         // Create notification for buyer
         await Notification.create({
-            user: task.buyer,
-            toEmail: task.buyer.email,
+            user: task.buyer?._id || task.buyer,
+            toEmail: task.buyer?.email,
             title: 'New Task Submission',
             message: `You have a new submission from ${req.user.name} for completing ${task.title}`,
             type: 'submission',

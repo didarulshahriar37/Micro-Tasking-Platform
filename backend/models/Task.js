@@ -67,12 +67,10 @@ const taskSchema = new mongoose.Schema({
     timestamps: true
 });
 
-// Initialize available_workers to required_workers before saving
-taskSchema.pre('save', function (next) {
-    if (this.isNew) {
+taskSchema.pre('validate', function () {
+    if (this.isNew && (this.available_workers === undefined || this.available_workers === null)) {
         this.available_workers = this.required_workers;
     }
-    next();
 });
 
 module.exports = mongoose.model('Task', taskSchema);

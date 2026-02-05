@@ -23,11 +23,55 @@ const ManageUsers = () => {
         }
     };
 
-    const handleRemoveUser = async (userId) => {
-        if (!window.confirm('Are you sure you want to remove this user? This action cannot be undone.')) return;
+    const confirmRemoveUser = (user) => new Promise((resolve) => {
+        toast.custom((t) => (
+            <div style={{
+                background: 'var(--bg-card)',
+                border: '1px solid var(--border-color)',
+                borderRadius: '16px',
+                padding: '18px',
+                boxShadow: '0 20px 50px rgba(0,0,0,0.25)',
+                width: '320px'
+            }}>
+                <div style={{ fontWeight: '700', fontSize: '16px', marginBottom: '6px' }}>Remove this user?</div>
+                <div style={{ color: 'var(--text-secondary)', fontSize: '13px', marginBottom: '14px' }}>
+                    {user.name}
+                </div>
+                <div style={{ color: 'var(--text-secondary)', fontSize: '12px', marginBottom: '18px' }}>
+                    This action cannot be undone.
+                </div>
+                <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
+                    <button
+                        className="btn btn-secondary"
+                        style={{ padding: '8px 12px', fontSize: '13px' }}
+                        onClick={() => {
+                            toast.dismiss(t.id);
+                            resolve(false);
+                        }}
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        className="btn btn-danger"
+                        style={{ padding: '8px 12px', fontSize: '13px' }}
+                        onClick={() => {
+                            toast.dismiss(t.id);
+                            resolve(true);
+                        }}
+                    >
+                        Remove
+                    </button>
+                </div>
+            </div>
+        ), { duration: Infinity });
+    });
+
+    const handleRemoveUser = async (user) => {
+        const confirmed = await confirmRemoveUser(user);
+        if (!confirmed) return;
 
         try {
-            await userService.deleteUser(userId);
+            await userService.deleteUser(user._id);
             toast.success('User removed successfully');
             fetchUsers();
         } catch (error) {
@@ -109,7 +153,7 @@ const ManageUsers = () => {
                                     </td>
                                     <td style={{ padding: '20px', textAlign: 'right' }}>
                                         <button
-                                            onClick={() => handleRemoveUser(u._id)}
+                                            onClick={() => handleRemoveUser(u)}
                                             className="btn btn-danger"
                                             style={{ padding: '6px 12px', fontSize: '12px' }}
                                         >
