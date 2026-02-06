@@ -24,6 +24,8 @@ import ManageTasks from './pages/ManageTasks';
 import PaymentSuccess from './pages/PaymentSuccess';
 import LoadingSpinner from './components/LoadingSpinner';
 import NotFound from './pages/NotFound';
+import TermsOfService from './pages/TermsOfService';
+import PrivacyPolicy from './pages/PrivacyPolicy';
 
 import './App.css';
 
@@ -51,6 +53,8 @@ const AppRoutes = () => {
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/" element={<Home />} />
+      <Route path="/terms" element={<TermsOfService />} />
+      <Route path="/privacy" element={<PrivacyPolicy />} />
 
       {/* Worker Routes */}
       <Route

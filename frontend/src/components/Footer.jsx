@@ -82,18 +82,18 @@ const Footer = () => {
                                 </Link>
                             </li>
                             <li style={{ marginBottom: '14px' }}>
-                                <a href="#" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontSize: '15px', transition: 'color 0.3s' }}
+                                <Link to="/terms" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontSize: '15px', transition: 'color 0.3s' }}
                                     onMouseEnter={(e) => e.target.style.color = 'var(--primary-color)'}
                                     onMouseLeave={(e) => e.target.style.color = 'var(--text-secondary)'}>
                                     Terms of Service
-                                </a>
+                                </Link>
                             </li>
                             <li style={{ marginBottom: '14px' }}>
-                                <a href="#" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontSize: '15px', transition: 'color 0.3s' }}
+                                <Link to="/privacy" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontSize: '15px', transition: 'color 0.3s' }}
                                     onMouseEnter={(e) => e.target.style.color = 'var(--primary-color)'}
                                     onMouseLeave={(e) => e.target.style.color = 'var(--text-secondary)'}>
                                     Privacy Policy
-                                </a>
+                                </Link>
                             </li>
                         </ul>
                     </div>
