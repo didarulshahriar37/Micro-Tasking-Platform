@@ -3,6 +3,7 @@ import Sidebar from './Sidebar';
 import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
 import { Menu, LogOut, Coins } from 'lucide-react';
+import ChatbotWidget from './ChatbotWidget';
 
 const DashboardLayout = ({ children }) => {
     const { user, logout } = useAuth();
@@ -175,6 +176,7 @@ const DashboardLayout = ({ children }) => {
                     MicroTask Platform • 2026
                 </footer>
             </div>
+            <ChatbotWidget />
         </div>
     );
 };
