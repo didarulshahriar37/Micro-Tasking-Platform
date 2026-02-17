@@ -87,20 +87,55 @@ const ChatbotWidget = () => {
     };
 
     return (
-        <div style={{
-            position: 'fixed',
-            right: '24px',
-            bottom: '24px',
-            zIndex: 1200,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'flex-end',
-            gap: '12px'
-        }}>
+        <>
+            <style>{`
+                .chatbot-root {
+                    bottom: calc(env(safe-area-inset-bottom, 0px) + 24px);
+                    right: 24px;
+                }
+                @media (max-width: 640px) {
+                    .chatbot-root {
+                        left: 12px !important;
+                        right: 12px !important;
+                        bottom: calc(env(safe-area-inset-bottom, 0px) + 12px) !important;
+                        align-items: stretch !important;
+                    }
+                    .chatbot-panel {
+                        width: 100% !important;
+                        max-height: 78vh !important;
+                    }
+                    .chatbot-toggle {
+                        align-self: flex-start;
+                        width: 50px !important;
+                        height: 50px !important;
+                        border-radius: 14px !important;
+                    }
+                }
+                @media (max-width: 420px) {
+                    .chatbot-panel {
+                        max-height: 72vh !important;
+                    }
+                }
+            `}</style>
+            <div
+                className="chatbot-root"
+                style={{
+                    position: 'fixed',
+                    right: '24px',
+                    bottom: 'calc(env(safe-area-inset-bottom, 0px) + 24px)',
+                    zIndex: 1200,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'flex-end',
+                    gap: '12px'
+                }}
+            >
             {isOpen && (
-                <div style={{
-                    width: '320px',
-                    maxHeight: '520px',
+                <div
+                    className="chatbot-panel"
+                    style={{
+                    width: 'min(360px, calc(100vw - 32px))',
+                    maxHeight: '70vh',
                     background: 'var(--bg-secondary)',
                     border: '1px solid var(--border-color)',
                     borderRadius: '18px',
@@ -245,6 +280,7 @@ const ChatbotWidget = () => {
             )}
 
             <button
+                className="chatbot-toggle"
                 onClick={toggleChat}
                 style={{
                     width: '56px',
@@ -264,7 +300,8 @@ const ChatbotWidget = () => {
             >
                 <MessageSquare size={20} />
             </button>
-        </div>
+            </div>
+        </>
     );
 };
 
